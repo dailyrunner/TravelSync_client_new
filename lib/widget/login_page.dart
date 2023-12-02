@@ -5,8 +5,9 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart'; // flutter_
 import 'package:travelsync_client_new/group/group_create_page.dart';
 
 import 'package:travelsync_client_new/models/model.dart';
-import 'package:travelsync_client_new/tour/Tour.dart';
+import 'package:travelsync_client_new/tour/tourListPage.dart';
 import 'package:travelsync_client_new/tour/createTour.dart';
+import 'package:travelsync_client_new/widget/globals.dart';
 import 'package:travelsync_client_new/widget/home_page.dart';
 import 'package:travelsync_client_new/widget/join.dart';
 import 'package:travelsync_client_new/widget/login_widget_group.dart';
@@ -18,11 +19,12 @@ class StartingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: navigatorKey,
       initialRoute: '/', // 앱이 시작될 때 보여질 화면
       routes: {
         '/join': (context) => const JoinPage(),
         '/main': (context) => const HomePage(),
-        '/main/tour': (context) => const Tour(),
+        '/main/tour': (context) => const TourListPage(),
         '/main/tour/createTour': (context) => const CreateTour(),
         '/main/group': (context) => const GroupCreatePage(),
         '/main/settings': (context) => const SettingsPage(),
@@ -196,8 +198,8 @@ class _LoginPageState extends State<LoginPage> {
                   onTap: () async {
                     if (await loginAction(username.text, password.text) ==
                         true) {
-                      Navigator.pushNamed(
-                          context, '/main'); // 로그인 이후 서비스 화면으로 이동
+                      navigatorKey.currentState
+                          ?.pushNamed('/main'); // 로그인 이후 서비스 화면으로 이동
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
@@ -257,7 +259,8 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     child: InkWell(
                       onTap: () {
-                        Navigator.pushNamed(context, '/join'); // 회원가입페이지로 이동
+                        navigatorKey.currentState
+                            ?.pushNamed('/join'); // 회원가입페이지로 이동
                       },
                       child: Container(
                         padding: const EdgeInsets.all(8.0),

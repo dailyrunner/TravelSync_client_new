@@ -3,6 +3,7 @@ import 'dart:convert'; // JSON Encode, Decode를 위한 패키지
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:travelsync_client_new/group/group_create_page.dart';
 import 'package:travelsync_client_new/logo/airplaneLogo.dart';
+import 'package:travelsync_client_new/widget/globals.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -52,7 +53,7 @@ class _HomePageState extends State<HomePage> {
           actions: [
             IconButton(
               onPressed: () {
-                Navigator.pushNamed(context, '/main/settings');
+                navigatorKey.currentState?.pushNamed('/main/settings');
               },
               icon: const Icon(Icons.settings_outlined),
               tooltip: 'settings',
@@ -141,7 +142,7 @@ class _HomePageState extends State<HomePage> {
             ElevatedButton(
               onPressed: () {
                 // 버튼이 눌리면 다른 페이지로 이동
-                Navigator.pushNamed(context, '/main/tour');
+                navigatorKey.currentState?.pushNamed('/main/tour');
               },
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(280, 45),
@@ -163,10 +164,7 @@ class _HomePageState extends State<HomePage> {
             ElevatedButton(
               onPressed: () {
                 // 버튼이 눌리면 다른 페이지로 이동
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const GroupCreatePage()));
+                navigatorKey.currentState?.pushNamed('/main/group');
               },
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(280, 45),
