@@ -1,6 +1,5 @@
 /*API 연동 중*/
 import 'package:flutter/material.dart';
-import '../widgets/button.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
@@ -8,37 +7,41 @@ class Plan extends StatelessWidget {
   Plan({Key? key, required this.dayCount}) : super(key: key);
   final int dayCount;
   final TextEditingController timeController = TextEditingController();
-  final TextEditingController placeController = TextEditingController();
+  final TextEditingController titleController = TextEditingController();
   final TextEditingController contentController = TextEditingController();
 
-  void _onDayPressed(int day) {
-    Text('Day$day');
-  }
+  List<Map<String, String>> planList = [];
 
-  Future<void> addPlan(String time, String place, String content) async {
-    // 실제 API 엔드포인트로 교체하세요
-    final apiUrl = Uri.parse('http://34.83.150.5:8080/tour');
-
-    final headers = {
-      'Authorization':
-          'Bearer eyJhbGciOiJIUzUxMiJ9.eyJleHAiOjE3MDY1MTAxNDYsInN1YiI6ImxkZSIsInR5cGUiOiJBQ0NFU1MifQ.0iicmLOf8iWcZGHlW62NHsdvNllBLQjw3h7kx9FXeJbSWriQieyVChgHImB3aHAb28FVdVco5-DRSxbjbbDK4A',
-      'Content-Type': 'application/json',
-    };
-    final payload = {
-      'time': time,
-      'planTitle': content,
-      'planContent': content,
-    };
+  Future<void> _onDayPressed(int day) async {
+    print('Day $day');
 
     try {
-      final response = await http.post(
-        apiUrl,
-        headers: headers,
-        body: jsonEncode(payload),
-      );
-
+      var url = Uri.parse("http://34.83.150.5:8080/plan");
+      Map<String, dynamic> data = {
+        "time": timeController.text,
+        "planTitle": titleController.text,
+        "planContent": contentController.text
+      };
+      var body = json.encode(data);
+      final response = await http.post(url,
+          headers: {
+            "accept": "*/*",
+            "Authorization":
+                "Bearer eyJhbGciOiJIUzUxMiJ9.eyJleHAiOjE3MDY2MDQ5NzcsInN1YiI6InJhY2tAcmV1bmcucmluIiwidHlwZSI6IkFDQ0VTUyJ9.-Q7JmTOYySnLug9goV3bBFt2OOpyrwkf3FBVF8eSGnag75yZBy-g6pL8-KQwwn-kUJhv43wg2iTRUifFixi2sQ",
+            "Content-Type": "application/json"
+          },
+          body: body);
       if (response.statusCode == 200) {
         const Text('일정이 성공적으로 추가되었습니다!');
+        var responseBody = jsonDecode(response.body);
+        int planId = responseBody["planId"];
+        planList.add({
+          "day": "Day $day",
+          "time": timeController.text,
+          "title": titleController.text,
+          "content": contentController.text,
+          "planId": planId.toString(),
+        });
       } else {
         Text('일정 추가에 실패했습니다. 상태 코드: ${response.statusCode}');
         Text('응답 본문: ${response.body}');
@@ -58,8 +61,8 @@ class Plan extends StatelessWidget {
         Row(
           children: [
             GestureDetector(
-              onTap: () {
-                _onDayPressed(dayCount);
+              onTap: () async {
+                await _onDayPressed(dayCount);
               },
               child: Padding(
                 padding: const EdgeInsets.only(left: 20),
@@ -69,11 +72,12 @@ class Plan extends StatelessWidget {
                   margin: const EdgeInsets.symmetric(horizontal: 5),
                   color: Colors.white,
                   child: Text(
-                    'Day$dayCount',
+                    'Day $dayCount',
                     style: const TextStyle(
                       color: Colors.black,
                       fontSize: 24,
                       fontWeight: FontWeight.w500,
+                      fontFamily: 'Inter',
                     ),
                   ),
                 ),
@@ -99,13 +103,14 @@ class Plan extends StatelessWidget {
                   color: Colors.black,
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
+                  fontFamily: 'Inter',
                 ),
               ),
             ),
             SizedBox(
               width: 230,
               child: TextField(
-                controller: timeController,
+                controller: timeController, //
                 decoration: const InputDecoration(
                   isDense: true,
                   hintText: '14:00',
@@ -113,9 +118,6 @@ class Plan extends StatelessWidget {
                     borderSide: BorderSide(color: Colors.blue), // 밑줄 색상 설정
                   ),
                 ),
-                // onChanged: (value) {
-                //   planList[0] = value;
-                // },
               ),
             ),
             const SizedBox(height: 10),
@@ -133,13 +135,14 @@ class Plan extends StatelessWidget {
                   color: Colors.black,
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
+                  fontFamily: 'Inter',
                 ),
               ),
             ),
             SizedBox(
               width: 230,
               child: TextField(
-                controller: placeController,
+                controller: titleController, //
                 decoration: const InputDecoration(
                   isDense: true,
                   hintText: '인천공항 M 창구 미팅',
@@ -147,9 +150,6 @@ class Plan extends StatelessWidget {
                     borderSide: BorderSide(color: Colors.blue), // 밑줄 색상 설정
                   ),
                 ),
-                // onChanged: (value) {
-                //   planList[1] = value;
-                // },
               ),
             ),
           ],
@@ -182,7 +182,7 @@ class Plan extends StatelessWidget {
                   bottom: 2.0,
                 ),
                 child: TextField(
-                  controller: contentController,
+                  controller: contentController, //
                   maxLines: null,
                   decoration: const InputDecoration(
                     hintText: '세부 사항을 입력하세요',
@@ -194,17 +194,38 @@ class Plan extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 20),
-        Button(
-          text: '일정 추가',
-          onPressed: () {
-            final time = timeController.text;
-            final place = placeController.text;
-            final content = contentController.text;
-            final myPlan = ['$time, $place, $content'];
-            addPlan(time, place, content);
-          },
-          buttonColor: const Color.fromARGB(255, 80, 80, 80),
-          width: 128.0,
+        SizedBox(
+          width: 120,
+          child: ElevatedButton(
+            onPressed: () async {
+              await _onDayPressed(dayCount);
+              Navigator.pushNamed(context, '/main/tour');
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFEFF5FF),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              shadowColor:
+                  const Color.fromARGB(255, 80, 80, 80).withOpacity(0.7),
+              elevation: 2.0,
+            ),
+            child: const Padding(
+              padding: EdgeInsets.symmetric(
+                vertical: 15,
+                horizontal: 16,
+              ),
+              child: Text(
+                '일정 추가',
+                style: TextStyle(
+                  color: Color.fromARGB(255, 80, 80, 80),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                  fontFamily: 'Inter',
+                ),
+              ),
+            ),
+          ),
         ),
       ],
     );

@@ -23,9 +23,11 @@ class GroupCreatePageState extends State<GroupCreatePage> {
   static const storage = FlutterSecureStorage();
   dynamic userKey = '';
   dynamic userInfo;
+  late String? url;
 
   checkUserState() async {
     userKey = await storage.read(key: 'login');
+    url = await storage.read(key: 'address');
     if (userKey == null) {
       Navigator.pushNamed(context, '/'); // 로그인 페이지로 이동
     } else {
@@ -145,7 +147,6 @@ class GroupCreatePageState extends State<GroupCreatePage> {
       );
     }
     try {
-      var url = Uri.parse("http://34.83.150.5:8080/group/create");
       Map<String, dynamic> data = {
         "guide": userInfo["accountName"],
         "groupName": groupNameController.text,
@@ -156,7 +157,7 @@ class GroupCreatePageState extends State<GroupCreatePage> {
         "groupPassword": groupPasswordController.text
       };
       var body = json.encode(data);
-      final response = await http.post(url,
+      final response = await http.post(Uri.parse("$url/group/create"),
           headers: {
             "accept": "*/*",
             "Authorization": "Bearer ${userInfo["accessToken"]}",

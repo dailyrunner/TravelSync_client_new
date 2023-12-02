@@ -23,9 +23,11 @@ class _GroupMainPageState extends State<GroupMainPage> {
   static const storage = FlutterSecureStorage();
   dynamic userKey = '';
   dynamic userInfo;
+  late String? url;
 
   checkUserState() async {
     userKey = await storage.read(key: 'login');
+    url = await storage.read(key: 'address');
     if (userKey == null) {
       Navigator.pushNamed(context, '/'); // 로그인 페이지로 이동
     } else {
@@ -55,7 +57,7 @@ class _GroupMainPageState extends State<GroupMainPage> {
         "Authorization": "Bearer ${userInfo["accessToken"]}"
       };
       final response = await http.get(
-          Uri.parse("http://34.83.150.5:8080/group/detail/${widget.groupId}"),
+          Uri.parse("$url/group/detail/${widget.groupId}"),
           headers: header);
       if (response.statusCode == 200) {
         var responseBody = jsonDecode(response.body);
@@ -110,7 +112,7 @@ class _GroupMainPageState extends State<GroupMainPage> {
         "Authorization": "Bearer ${userInfo['accessToken']}"
       };
       final response = await http.get(
-          Uri.parse('http://34.83.150.5:8080/user/info/${groupdetail.guide}'),
+          Uri.parse('$url/user/info/${groupdetail.guide}'),
           headers: header);
       if (response.statusCode == 200) {
         var responseBody = jsonDecode(response.body);

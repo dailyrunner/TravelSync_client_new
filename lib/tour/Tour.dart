@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:travelsync_client_new/logo/airplaneLogo.dart';
 import 'package:travelsync_client_new/tour/tourHome.dart';
-import '../../widgets/button.dart';
 import '../../widgets/header.dart';
-import '../../tour/createTour.dart';
 
 class Tour extends StatelessWidget {
   const Tour({super.key});

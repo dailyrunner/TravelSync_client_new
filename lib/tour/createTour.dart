@@ -11,10 +11,12 @@ import 'dart:convert';
 class CreateTour extends StatefulWidget {
   const CreateTour({Key? key}) : super(key: key);
   @override
-  _CreateTourState createState() => _CreateTourState();
+  State<CreateTour> createState() => CreateTourState();
 }
 
-class _CreateTourState extends State<CreateTour> {
+class CreateTourState extends State<CreateTour> {
+  final TextEditingController tourName = TextEditingController();
+  final TextEditingController tourCompany = TextEditingController();
   int dayCount = 1;
   void _addDay() {
     setState(() {
@@ -42,7 +44,7 @@ class _CreateTourState extends State<CreateTour> {
             },
           ),
         ),
-        backgroundColor: const Color(0xFFF5FBFF),
+        backgroundColor: Colors.white,
         body: Column(
           children: [
             const SingleChildScrollView(),
@@ -71,7 +73,7 @@ class _CreateTourState extends State<CreateTour> {
                           for (int i = 1; i <= dayCount; i++)
                             GestureDetector(
                               onTap: () {
-                                Text('DDay$i');
+                                Text('Day$i');
                               },
                               child: Container(
                                 width: 80,
@@ -86,6 +88,7 @@ class _CreateTourState extends State<CreateTour> {
                                     color: Colors.black,
                                     fontSize: 18,
                                     fontWeight: FontWeight.w400,
+                                    fontFamily: 'Inter',
                                   ),
                                 ),
                               ),
@@ -141,6 +144,7 @@ class TourName extends StatelessWidget {
                   color: Colors.black,
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
+                  fontFamily: 'Inter',
                 ),
               ),
             ),
@@ -165,6 +169,7 @@ class TourName extends StatelessWidget {
                   color: Colors.black,
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
+                  fontFamily: 'Inter',
                 ),
               ),
             ),

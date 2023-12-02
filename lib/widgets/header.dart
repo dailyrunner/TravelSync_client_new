@@ -29,13 +29,14 @@ class Header extends StatelessWidget {
                   ),
                 ),
               ),
-              width: 200.0,
+              width: 220.0,
               child: Text(
                 textHeader,
                 style: const TextStyle(
-                  fontSize: 32,
+                  fontSize: 35,
                   color: Colors.black,
                   fontWeight: FontWeight.w600,
+                  fontFamily: 'Inter',
                 ),
               ),
             ),
