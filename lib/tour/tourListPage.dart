@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:travelsync_client_new/logo/airplaneLogo.dart';
 import 'package:travelsync_client_new/tour/tourListView.dart';
+import 'package:travelsync_client_new/widget/globals.dart';
 import '../../widgets/header.dart';
 
 class TourListPage extends StatelessWidget {
@@ -22,7 +23,7 @@ class TourListPage extends StatelessWidget {
             tooltip: '뒤로가기',
             color: Colors.black,
             onPressed: () {
-              Navigator.pop(context);
+              navigatorKey.currentState?.pop();
             },
           ),
         ),
@@ -45,7 +46,8 @@ class TourListPage extends StatelessWidget {
                     width: 160,
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.pushNamed(context, '/main/tour/createTour');
+                        navigatorKey.currentState
+                            ?.pushNamed('/main/tour/createTour');
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFEFF5FF),
@@ -77,7 +79,8 @@ class TourListPage extends StatelessWidget {
                     width: 160,
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.pushNamed(context, '/main/tour/createTour');
+                        navigatorKey.currentState
+                            ?.pushNamed('/main/tour/createTour');
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFF5FbFF),

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 
 class NoTourMessage extends StatelessWidget {
   const NoTourMessage({super.key});
-
   @override
   Widget build(BuildContext context) {
     return Row(

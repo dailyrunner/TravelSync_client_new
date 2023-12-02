@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:travelsync_client_new/tour/tourListPage.dart';
+import 'package:travelsync_client_new/widget/globals.dart';
 
 class PlanCreatePage extends StatefulWidget {
   PlanCreatePage({Key? key, required this.dayCount}) : super(key: key);
@@ -89,8 +90,6 @@ class _PlanCreatePageState extends State<PlanCreatePage> {
           "content": contentController.text,
           "PlanCreatePageId": PlanCreatePageId.toString(),
         };
-        // bool dayExists =
-        //     PlanCreatePageList.any((element) => element["day"] == "Day $day");
       } else {
         SnackBar(
           content: Text('일정 추가 실패. 상태 코드: ${response.statusCode}'),
@@ -108,7 +107,6 @@ class _PlanCreatePageState extends State<PlanCreatePage> {
     return Column(
       children: [
         const SingleChildScrollView(),
-        // PlanCreatePageDay
         Row(
           children: [
             GestureDetector(
@@ -166,7 +164,7 @@ class _PlanCreatePageState extends State<PlanCreatePage> {
                   isDense: true,
                   hintText: '14:00',
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.blue), // 밑줄 색상 설정
+                    borderSide: BorderSide(color: Colors.blue),
                   ),
                 ),
               ),
@@ -198,7 +196,7 @@ class _PlanCreatePageState extends State<PlanCreatePage> {
                   isDense: true,
                   hintText: '인천공항 M 창구 미팅',
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.blue), // 밑줄 색상 설정
+                    borderSide: BorderSide(color: Colors.blue),
                   ),
                 ),
               ),
@@ -237,7 +235,7 @@ class _PlanCreatePageState extends State<PlanCreatePage> {
                   maxLines: null,
                   decoration: const InputDecoration(
                     hintText: '세부 사항을 입력하세요',
-                    border: InputBorder.none, //입력 부분 밑줄 생략
+                    border: InputBorder.none,
                   ),
                 ),
               ),
@@ -250,7 +248,7 @@ class _PlanCreatePageState extends State<PlanCreatePage> {
           child: ElevatedButton(
             onPressed: () async {
               await _onDayPressed(widget.dayCount);
-              Navigator.pushNamed(context, '/main/tour');
+              navigatorKey.currentState?.pushNamed('/main/tour');
             }, //저장하고 다시 TourListPage로 돌아감. 물론 값을 갖고 가야하는디...ㅋㅋㅋ
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFEFF5FF),
