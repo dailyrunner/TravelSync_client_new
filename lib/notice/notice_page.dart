@@ -1,9 +1,15 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:http/http.dart' as http;
+import 'package:travelsync_client_new/models/notice.dart';
 import 'package:travelsync_client_new/notice/notice_create.dart';
 import 'package:travelsync_client_new/widgets/header.dart';
 
 class NoticePage extends StatefulWidget {
-  const NoticePage({super.key});
+  final int groupId;
+  const NoticePage({super.key, required this.groupId});
 
   @override
   State<NoticePage> createState() => _NoticePageState();
@@ -12,6 +18,48 @@ class NoticePage extends StatefulWidget {
 class _NoticePageState extends State<NoticePage> {
   late bool noticeExist = false;
   late bool isGuide = true;
+  static const storage = FlutterSecureStorage();
+  dynamic userKey = '';
+  dynamic userInfo;
+  List<Notice> noticeList = [];
+
+  checkUserState() async {
+    userKey = await storage.read(key: 'login');
+    if (userKey == null) {
+      Navigator.pushNamed(context, '/'); // 로그인 페이지로 이동
+    } else {
+      userInfo = jsonDecode(userKey);
+      await getNoticeList();
+    }
+  }
+
+  getNoticeList() async {
+    try {
+      final url = 'http://34.83.150.5:8080/notice/${widget.groupId}';
+      Map<String, String> header = {
+        "accept": "*/*",
+        "Authorization": "Bearer ${userInfo["accessToken"]}"
+      };
+      final response = await http.get(
+        Uri.parse(url),
+        headers: header,
+      );
+      if (response.statusCode == 200) {
+        final notices = jsonDecode(response.body);
+        if (notices == null) {
+          noticeExist = false;
+          return;
+        }
+        for (var notice in notices) {
+          noticeList.add(Notice.fromJson(notice));
+        }
+      } else {
+        print('error');
+      }
+    } catch (e) {
+      throw Error();
+    }
+  }
 
   void createNotice() {
     Navigator.push(context,

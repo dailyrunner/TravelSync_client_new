@@ -36,7 +36,11 @@ class _GroupMainPageState extends State<GroupMainPage> {
 
   void goNoticePage() {
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => const NoticePage()));
+        context,
+        MaterialPageRoute(
+            builder: (context) => NoticePage(
+                  groupId: widget.groupId,
+                )));
   }
 
   void importPlan() {}
