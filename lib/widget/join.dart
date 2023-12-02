@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'globals.dart';
 
 class JoinPage extends StatefulWidget {
   const JoinPage({super.key});
@@ -112,14 +113,15 @@ class _JoinPageState extends State<JoinPage> {
       Response response = await dio.post('$url/user/signup', data: param);
 
       if (response.statusCode == 200) {
+        print(response.data);
         String result = response.data;
 
-        if (result.compareTo('SingUp Fail') == 0) {
-          print('회원가입 실패');
-          return false;
-        } else {
+        if (result.compareTo('SignUp Success') == 0) {
           print('회원가입 성공');
           return true;
+        } else {
+          print('회원가입 실패');
+          return false;
         }
       } else {
         print('error');
@@ -133,6 +135,7 @@ class _JoinPageState extends State<JoinPage> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      scaffoldMessengerKey: snackbarKey,
       home: Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
@@ -374,27 +377,25 @@ class _JoinPageState extends State<JoinPage> {
             ),
             ElevatedButton(
               onPressed: () async {
-                joinReadyCheck();
+                //joinReadyCheck();
                 if (joinReady) {
                   if (await submitJoin(userName.text, userId.text,
                           password.text, phoneNum.text) ==
                       true) {
                     Navigator.pushNamed(context, '/');
                   } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('회원가입에 실패했습니다.'),
-                        duration: Duration(seconds: 1), // SnackBar가 표시되는 시간 설정
-                      ),
+                    const SnackBar snackBar = SnackBar(
+                      content: Text("회원가입에 실패했습니다."),
+                      duration: Duration(seconds: 1),
                     );
+                    snackbarKey.currentState?.showSnackBar(snackBar);
                   }
                 } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('올바르게 기입 후 다시 시도하세요.'),
-                      duration: Duration(seconds: 1), // SnackBar가 표시되는 시간 설정
-                    ),
+                  const SnackBar snackBar = SnackBar(
+                    content: Text("올바르게 기입 후 다시 시도하세요."),
+                    duration: Duration(seconds: 1),
                   );
+                  snackbarKey.currentState?.showSnackBar(snackBar);
                 }
               },
               style: ElevatedButton.styleFrom(
