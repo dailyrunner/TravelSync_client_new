@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../tour/emptyTour.dart';
 
-class TourHome extends StatelessWidget {
-  const TourHome({super.key});
+class TourListView extends StatelessWidget {
+  const TourListView({super.key});
 
   @override
   Widget build(BuildContext context) {

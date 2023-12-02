@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:travelsync_client_new/logo/airplaneLogo.dart';
-import 'package:travelsync_client_new/tour/tourHome.dart';
+import 'package:travelsync_client_new/tour/tourListView.dart';
 import '../../widgets/header.dart';
 
-class Tour extends StatelessWidget {
-  const Tour({super.key});
+class TourListPage extends StatelessWidget {
+  const TourListPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +36,7 @@ class Tour extends StatelessWidget {
               const SizedBox(height: 40),
               const Header(textHeader: 'TOUR List'), //title
               const SizedBox(height: 70),
-              const TourHome(),
+              const TourListView(),
               const SizedBox(height: 240),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
