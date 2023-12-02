@@ -25,6 +25,7 @@ class _GroupSettingPageState extends State<GroupSettingPage> {
   dynamic userKey = '';
   dynamic userInfo;
   late GroupDetail groupdetail;
+  late String? url;
 
   void importTour() {}
 
@@ -66,7 +67,7 @@ class _GroupSettingPageState extends State<GroupSettingPage> {
         "Authorization": "Bearer ${userInfo['accessToken']}"
       };
       final response = await http.delete(
-          Uri.parse('http://34.83.150.5:8080/group/leave/${widget.groupId}'),
+          Uri.parse('$url/group/leave/${widget.groupId}'),
           headers: header);
       if (response.statusCode == 200) {
         if (!mounted) return;
@@ -170,9 +171,8 @@ class _GroupSettingPageState extends State<GroupSettingPage> {
         "accept": "*/*",
         "Authorization": "Bearer ${userInfo['accessToken']}"
       };
-      final response = await http.delete(
-          Uri.parse('http://34.83.150.5:8080/group/${widget.groupId}'),
-          headers: header);
+      final response = await http
+          .delete(Uri.parse('$url/group/${widget.groupId}'), headers: header);
       if (response.statusCode == 200) {
         if (!mounted) return;
         showDialog(
@@ -240,6 +240,7 @@ class _GroupSettingPageState extends State<GroupSettingPage> {
 
   checkUserState() async {
     userKey = await storage.read(key: 'login');
+    url = await storage.read(key: 'address');
     if (userKey == null) {
       Navigator.pushNamed(context, '/'); // 로그인 페이지로 이동
     } else {
@@ -255,7 +256,7 @@ class _GroupSettingPageState extends State<GroupSettingPage> {
         "Authorization": "Bearer ${userInfo["accessToken"]}"
       };
       final response = await http.get(
-          Uri.parse("http://34.83.150.5:8080/group/detail/${widget.groupId}"),
+          Uri.parse("$url/group/detail/${widget.groupId}"),
           headers: header);
       if (response.statusCode == 200) {
         var responseBody = jsonDecode(response.body);
@@ -270,7 +271,7 @@ class _GroupSettingPageState extends State<GroupSettingPage> {
               builder: (BuildContext context) {
                 // return object of type Dialog
                 return AlertDialog(
-                  content: const Text("그룹 생성 중 오류가 발생했습니다."),
+                  content: const Text("페이지 로드 중 오류가 발생했습니다."),
                   actions: <Widget>[
                     TextButton(
                       child: const Text("닫기"),
