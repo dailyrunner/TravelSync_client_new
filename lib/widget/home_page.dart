@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'dart:convert'; // JSON Encode, Decode를 위한 패키지
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:travelsync_client_new/logo/airplaneLogo.dart';
-import 'package:travelsync_client_new/tour/Tour.dart';
-import 'package:travelsync_client_new/widget/settings_page.dart'; // flutter_secure_storage 패키지
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});

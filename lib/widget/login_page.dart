@@ -42,6 +42,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   var username = TextEditingController(); // id 입력 저장
   var password = TextEditingController(); // pw 입력 저장
+  late String url;
 
   static const storage =
       FlutterSecureStorage(); // FlutterSecureStorage를 storage로 저장
@@ -62,6 +63,7 @@ class _LoginPageState extends State<LoginPage> {
     // read 함수로 key값에 맞는 정보를 불러오고 데이터타입은 String 타입
     // 데이터가 없을때는 null을 반환
     userInfo = await storage.read(key: 'login');
+    url = (await storage.read(key: 'address'))!;
 
     // user의 정보가 있다면 로그인 후 들어가는 첫 페이지로 넘어가게 합니다.
     if (userInfo != null) {
@@ -75,8 +77,7 @@ class _LoginPageState extends State<LoginPage> {
       var dio = Dio();
       var param = {'userId': '$accountName', 'password': '$password'};
 
-      Response response =
-          await dio.post('http://34.83.150.5:8080/user/login', data: param);
+      Response response = await dio.post('$url/user/login', data: param);
 
       if (response.statusCode == 200) {
         Map<String, dynamic> jsonDataMap = response.data;
