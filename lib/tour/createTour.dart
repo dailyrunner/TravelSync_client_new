@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:travelsync_client_new/logo/airplaneLogo.dart';
+import 'package:travelsync_client_new/widget/globals.dart';
 import '../widgets/header.dart';
 import '../plan/createPlan.dart';
 
@@ -73,7 +74,7 @@ class CreateTourState extends State<CreateTour> {
             tooltip: '뒤로가기',
             color: Colors.black,
             onPressed: () {
-              Navigator.pop(context);
+              navigatorKey.currentState?.pop();
             },
           ),
         ),
@@ -120,7 +121,7 @@ class CreateTourState extends State<CreateTour> {
                                   style: TextStyle(
                                     color: selectedDay == i
                                         ? const Color(0xff004ECF)
-                                        : Colors.black, // 선택된 Day는 흰색, 아니면 검은색
+                                        : Colors.black,
                                     fontSize: 19,
                                     fontWeight: FontWeight.w400,
                                     fontFamily: 'Inter',
