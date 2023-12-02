@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class JoinPage extends StatefulWidget {
   const JoinPage({super.key});
@@ -8,13 +10,40 @@ class JoinPage extends StatefulWidget {
 }
 
 class _JoinPageState extends State<JoinPage> {
+  late String url;
+
+  static const storage =
+      FlutterSecureStorage(); // FlutterSecureStorage를 storage로 저장
+  dynamic userInfo = ''; // storage에 있는 유저 정보를 저장
+
+  //flutter_secure_storage 사용을 위한 초기화 작업
+  @override
+  void initState() {
+    super.initState();
+
+    // 비동기로 flutter secure storage 정보를 불러오는 작업
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _asyncMethod();
+    });
+  }
+
+  _asyncMethod() async {
+    // read 함수로 key값에 맞는 정보를 불러오고 데이터타입은 String 타입
+    // 데이터가 없을때는 null을 반환
+    userInfo = await storage.read(key: 'login');
+    url = (await storage.read(key: 'address'))!;
+
+    // user의 정보가 있다면 로그인 후 들어가는 첫 페이지로 넘어가게 합니다.
+    if (userInfo != null) {
+      Navigator.pushNamed(context, '/main');
+    }
+  }
+
   var userName = TextEditingController(); // 이름 입력 저장
-  final TextEditingController _userId = TextEditingController(); // 이메일 입력 저장
+  var userId = TextEditingController(); // 이메일 입력 저장
   var password = TextEditingController(); // pw 입력 저장
   var passwordConfirm = TextEditingController(); // pw확인 입력 저장
   var phoneNum = TextEditingController(); // 휴대폰번호 입력 저장
-
-  final FocusNode _emailFocus = FocusNode();
 
   bool checkUserName = false;
   bool checkUserIdForm = false;
@@ -25,7 +54,7 @@ class _JoinPageState extends State<JoinPage> {
   bool agree1 = false;
   bool agree2 = false;
 
-  bool joinReady = false;
+  bool joinReady = true;
 
   String? _emailFormCheck(FocusNode focusNode, String value) {
     checkUserId = false;
@@ -70,6 +99,37 @@ class _JoinPageState extends State<JoinPage> {
     }
   }
 
+  submitJoin(userName, userId, password, phoneNum) async {
+    try {
+      var dio = Dio();
+      var param = {
+        'userId': '$userId',
+        'name': '$userName',
+        'phone': '$userId',
+        'password': '$password'
+      };
+
+      Response response = await dio.post('$url/user/signup', data: param);
+
+      if (response.statusCode == 200) {
+        String result = response.data;
+
+        if (result.compareTo('SingUp Fail') == 0) {
+          print('회원가입 실패');
+          return false;
+        } else {
+          print('회원가입 성공');
+          return true;
+        }
+      } else {
+        print('error');
+        return false;
+      }
+    } catch (e) {
+      return false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -89,7 +149,6 @@ class _JoinPageState extends State<JoinPage> {
             },
           ),
         ),
-        backgroundColor: const Color(0xFFF5FBFF),
         body: Column(
           children: [
             Container(
@@ -162,14 +221,12 @@ class _JoinPageState extends State<JoinPage> {
                 // 비밀번호 입력 영역
                 SizedBox(
                   width: 170,
-                  child: TextFormField(
+                  child: TextField(
                     keyboardType: TextInputType.emailAddress,
-                    focusNode: _emailFocus,
-                    controller: _userId,
+                    controller: userId,
                     decoration: const InputDecoration(
                       hintText: 'gd@example.com',
                     ),
-                    validator: (value) => _emailFormCheck(_emailFocus, value!),
                   ),
                 ),
                 ElevatedButton(
@@ -319,7 +376,26 @@ class _JoinPageState extends State<JoinPage> {
               onPressed: () async {
                 joinReadyCheck();
                 if (joinReady) {
-                } else {}
+                  if (await submitJoin(userName.text, userId.text,
+                          password.text, phoneNum.text) ==
+                      true) {
+                    Navigator.pushNamed(context, '/');
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('회원가입에 실패했습니다.'),
+                        duration: Duration(seconds: 1), // SnackBar가 표시되는 시간 설정
+                      ),
+                    );
+                  }
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('올바르게 기입 후 다시 시도하세요.'),
+                      duration: Duration(seconds: 1), // SnackBar가 표시되는 시간 설정
+                    ),
+                  );
+                }
               },
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(150, 50),
