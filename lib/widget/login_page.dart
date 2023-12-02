@@ -5,7 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart'; // flutter_
 import 'package:travelsync_client_new/group/group_create_page.dart';
 
 import 'package:travelsync_client_new/models/model.dart';
-import 'package:travelsync_client_new/tour/Tour.dart';
+import 'package:travelsync_client_new/tour/tourListPage.dart';
 import 'package:travelsync_client_new/tour/createTour.dart';
 import 'package:travelsync_client_new/widget/home_page.dart';
 import 'package:travelsync_client_new/widget/join.dart';
@@ -22,7 +22,7 @@ class StartingPage extends StatelessWidget {
       routes: {
         '/join': (context) => const JoinPage(),
         '/main': (context) => const HomePage(),
-        '/main/tour': (context) => const Tour(),
+        '/main/tour': (context) => const TourListPage(),
         '/main/tour/createTour': (context) => const CreateTour(),
         '/main/group': (context) => const GroupCreatePage(),
         '/main/settings': (context) => const SettingsPage(),
