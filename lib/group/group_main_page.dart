@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:travelsync_client_new/group/group_setting_page.dart';
 import 'package:travelsync_client_new/models/group.dart';
 import 'package:travelsync_client_new/notice/notice_page.dart';
 import 'package:travelsync_client_new/widgets/header.dart';
@@ -178,6 +179,21 @@ class _GroupMainPageState extends State<GroupMainPage> {
               Navigator.pop(context);
             },
           ),
+          actions: [
+            IconButton(
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            GroupSettingPage(groupId: widget.groupId)));
+              },
+              icon: const Icon(Icons.settings_outlined),
+              tooltip: 'settings',
+              color: Colors.black,
+              iconSize: 40,
+            ),
+          ],
         ),
         backgroundColor: const Color(0xFFF5FBFF),
         body: FutureBuilder(
