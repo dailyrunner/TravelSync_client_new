@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:travelsync_client_new/group/group_setting_page.dart';
 import 'package:travelsync_client_new/models/group.dart';
 import 'package:travelsync_client_new/notice/notice_page.dart';
 import 'package:travelsync_client_new/widgets/header.dart';
@@ -18,10 +20,27 @@ class _GroupMainPageState extends State<GroupMainPage> {
   late bool isGuide;
   late GroupDetail groupdetail;
   late GuideInfo guideInfo;
+  static const storage = FlutterSecureStorage();
+  dynamic userKey = '';
+  dynamic userInfo;
+
+  checkUserState() async {
+    userKey = await storage.read(key: 'login');
+    if (userKey == null) {
+      Navigator.pushNamed(context, '/'); // 로그인 페이지로 이동
+    } else {
+      userInfo = jsonDecode(userKey);
+      await waitForGroupInfo();
+    }
+  }
 
   void goNoticePage() {
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => const NoticePage()));
+        context,
+        MaterialPageRoute(
+            builder: (context) => NoticePage(
+                  groupId: widget.groupId,
+                )));
   }
 
   void importPlan() {}
@@ -33,8 +52,7 @@ class _GroupMainPageState extends State<GroupMainPage> {
     try {
       Map<String, String> header = {
         "accept": "*/*",
-        "Authorization":
-            "Bearer eyJhbGciOiJIUzUxMiJ9.eyJleHAiOjE3MDY2MDQ5NzcsInN1YiI6InJhY2tAcmV1bmcucmluIiwidHlwZSI6IkFDQ0VTUyJ9.-Q7JmTOYySnLug9goV3bBFt2OOpyrwkf3FBVF8eSGnag75yZBy-g6pL8-KQwwn-kUJhv43wg2iTRUifFixi2sQ"
+        "Authorization": "Bearer ${userInfo["accessToken"]}"
       };
       final response = await http.get(
           Uri.parse("http://34.83.150.5:8080/group/detail/${widget.groupId}"),
@@ -89,8 +107,7 @@ class _GroupMainPageState extends State<GroupMainPage> {
     try {
       Map<String, String> header = {
         "accept": "*/*",
-        "Authorization":
-            "Bearer eyJhbGciOiJIUzUxMiJ9.eyJleHAiOjE3MDY2MDQ5NzcsInN1YiI6InJhY2tAcmV1bmcucmluIiwidHlwZSI6IkFDQ0VTUyJ9.-Q7JmTOYySnLug9goV3bBFt2OOpyrwkf3FBVF8eSGnag75yZBy-g6pL8-KQwwn-kUJhv43wg2iTRUifFixi2sQ"
+        "Authorization": "Bearer ${userInfo['accessToken']}"
       };
       final response = await http.get(
           Uri.parse('http://34.83.150.5:8080/user/info/${groupdetail.guide}'),
@@ -98,7 +115,7 @@ class _GroupMainPageState extends State<GroupMainPage> {
       if (response.statusCode == 200) {
         var responseBody = jsonDecode(response.body);
         guideInfo = GuideInfo.fromJson(responseBody);
-        guideInfo.userId == groupdetail.guide
+        userInfo['accountName'] == groupdetail.guide
             ? isGuide = true
             : isGuide = false;
       } else {
@@ -144,7 +161,7 @@ class _GroupMainPageState extends State<GroupMainPage> {
   }
 
   Future<void> wait() async {
-    await waitForGroupInfo();
+    await checkUserState();
   }
 
   @override
@@ -166,6 +183,21 @@ class _GroupMainPageState extends State<GroupMainPage> {
               Navigator.pop(context);
             },
           ),
+          actions: [
+            IconButton(
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            GroupSettingPage(groupId: widget.groupId)));
+              },
+              icon: const Icon(Icons.settings_outlined),
+              tooltip: 'settings',
+              color: Colors.black,
+              iconSize: 40,
+            ),
+          ],
         ),
         backgroundColor: const Color(0xFFF5FBFF),
         body: FutureBuilder(

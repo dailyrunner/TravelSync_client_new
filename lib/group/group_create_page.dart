@@ -21,12 +21,15 @@ class GroupCreatePageState extends State<GroupCreatePage> {
   final TextEditingController tourCompanyController = TextEditingController();
   final TextEditingController groupPasswordController = TextEditingController();
   static const storage = FlutterSecureStorage();
-  dynamic userInfo = '';
-/*
+  dynamic userKey = '';
+  dynamic userInfo;
+
   checkUserState() async {
-    userInfo = await storage.read(key: 'login');
-    if (userInfo == null) {
+    userKey = await storage.read(key: 'login');
+    if (userKey == null) {
       Navigator.pushNamed(context, '/'); // 로그인 페이지로 이동
+    } else {
+      userInfo = jsonDecode(userKey);
     }
   }
 
@@ -39,7 +42,7 @@ class GroupCreatePageState extends State<GroupCreatePage> {
       checkUserState();
     });
   }
-*/
+
   // 그룹 생성 버튼 누를시
   void createGroup() async {
     if (groupNameController.text.isEmpty) {
@@ -144,7 +147,7 @@ class GroupCreatePageState extends State<GroupCreatePage> {
     try {
       var url = Uri.parse("http://34.83.150.5:8080/group/create");
       Map<String, dynamic> data = {
-        "guide": "rack@reung.rin",
+        "guide": userInfo["accountName"],
         "groupName": groupNameController.text,
         "tourCompany": tourCompanyController.text,
         "startDate": selectedStartDate.toIso8601String(),
@@ -156,8 +159,7 @@ class GroupCreatePageState extends State<GroupCreatePage> {
       final response = await http.post(url,
           headers: {
             "accept": "*/*",
-            "Authorization":
-                "Bearer eyJhbGciOiJIUzUxMiJ9.eyJleHAiOjE3MDY2MDQ5NzcsInN1YiI6InJhY2tAcmV1bmcucmluIiwidHlwZSI6IkFDQ0VTUyJ9.-Q7JmTOYySnLug9goV3bBFt2OOpyrwkf3FBVF8eSGnag75yZBy-g6pL8-KQwwn-kUJhv43wg2iTRUifFixi2sQ",
+            "Authorization": "Bearer ${userInfo["accessToken"]}",
             "Content-Type": "application/json"
           },
           body: body);
