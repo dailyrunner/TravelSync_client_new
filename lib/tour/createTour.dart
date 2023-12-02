@@ -151,7 +151,7 @@ class CreateTourState extends State<CreateTour> {
               ),
             ),
             const SizedBox(height: 12),
-            PlanCreatePage(tourId: selectedDay)
+            PlanCreatePage(dayCount: selectedDay)
           ],
         ),
       ),

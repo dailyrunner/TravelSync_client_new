@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:travelsync_client_new/tour/tourListPage.dart';
 
 class PlanCreatePage extends StatefulWidget {
-  PlanCreatePage({Key? key, required this.tourId}) : super(key: key);
-  var tourId = 1;
+  PlanCreatePage({Key? key, required this.dayCount}) : super(key: key);
+  var dayCount = 1;
   static const storage = FlutterSecureStorage();
   @override
   State<PlanCreatePage> createState() => _PlanCreatePageState();
@@ -17,7 +18,7 @@ class _PlanCreatePageState extends State<PlanCreatePage> {
   final TextEditingController titleController = TextEditingController();
   final TextEditingController contentController = TextEditingController();
   late String url;
-  int dayCount = 1;
+  var tourId = 0;
 
   // FlutterSecureStorage를 storage로 저장
   dynamic userInfo = '';
@@ -78,8 +79,8 @@ class _PlanCreatePageState extends State<PlanCreatePage> {
         int PlanCreatePageId = responseBody["PlanCreatePageId"];
 
         Map<String, dynamic> PlanCreatePageItem = {
-          "tourId": widget.tourId,
-          "day": dayCount,
+          "tourId": tourId,
+          "day": widget.dayCount,
           "time": {
             "hour": hour,
             "minute": minute,
@@ -112,7 +113,7 @@ class _PlanCreatePageState extends State<PlanCreatePage> {
           children: [
             GestureDetector(
               onTap: () async {
-                await _onDayPressed(widget.tourId);
+                await _onDayPressed(widget.dayCount);
               },
               child: Padding(
                 padding: const EdgeInsets.only(left: 20),
@@ -122,7 +123,7 @@ class _PlanCreatePageState extends State<PlanCreatePage> {
                   margin: const EdgeInsets.symmetric(horizontal: 5),
                   color: Colors.white,
                   child: Text(
-                    'Day ${widget.tourId}',
+                    'Day ${widget.dayCount}',
                     style: const TextStyle(
                       color: Colors.black,
                       fontSize: 24,
@@ -248,9 +249,9 @@ class _PlanCreatePageState extends State<PlanCreatePage> {
           width: 120,
           child: ElevatedButton(
             onPressed: () async {
-              await _onDayPressed(widget.tourId);
-              Navigator.pushNamed(context, '/main/tour/Tour');
-            },
+              await _onDayPressed(widget.dayCount);
+              Navigator.pushNamed(context, '/main/tour');
+            }, //저장하고 다시 TourListPage로 돌아감. 물론 값을 갖고 가야하는디...ㅋㅋㅋ
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFEFF5FF),
               shape: RoundedRectangleBorder(
