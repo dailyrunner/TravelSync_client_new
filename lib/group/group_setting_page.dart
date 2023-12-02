@@ -28,6 +28,25 @@ class _GroupSettingPageState extends State<GroupSettingPage> {
   late String? url;
 
   void importTour() {}
+  updateGroupSetting() {
+    try {} catch (e) {
+      Error();
+    }
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+              content: const Text("설정을 변경했습니다."),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text("확인"),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                )
+              ]);
+        });
+  }
 
   leaveGroupAlert() {
     return showDialog(
@@ -384,6 +403,21 @@ class _GroupSettingPageState extends State<GroupSettingPage> {
                     textAlign: TextAlign.center,
                   ),
                   Text("비밀번호:$groupPassword\n$groupURL"),
+                  ElevatedButton(
+                    onPressed: updateGroupSetting,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xfff5fbff),
+                    ),
+                    child: const Text(
+                      "설정 저장",
+                      style: TextStyle(
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
                   ElevatedButton(
                     onPressed: deleteGroupAlert,
                     style: ElevatedButton.styleFrom(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert'; // JSON Encode, Decode를 위한 패키지
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:travelsync_client_new/group/group_create_page.dart';
 import 'package:travelsync_client_new/logo/airplaneLogo.dart';
 
 class HomePage extends StatefulWidget {
@@ -162,7 +163,10 @@ class _HomePageState extends State<HomePage> {
             ElevatedButton(
               onPressed: () {
                 // 버튼이 눌리면 다른 페이지로 이동
-                Navigator.pushNamed(context, '/main/group');
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const GroupCreatePage()));
               },
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(280, 45),
