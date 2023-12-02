@@ -148,7 +148,7 @@ class _JoinPageState extends State<JoinPage> {
             ),
             onPressed: () {
               // 뒤로가기 버튼을 눌렀을 때 수행할 동작
-              Navigator.pop(context);
+              navigatorKey.currentState?.pop();
             },
           ),
         ),

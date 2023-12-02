@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert'; // JSON Encode, Decode를 위한 패키지
-import 'package:flutter_secure_storage/flutter_secure_storage.dart'; // flutter_secure_storage 패키지
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:travelsync_client_new/widget/globals.dart'; // flutter_secure_storage 패키지
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -41,7 +42,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   logout() async {
     await storage.delete(key: 'login');
-    Navigator.pushNamed(context, '/');
+    navigatorKey.currentState?.pushNamed('/');
   }
 
   @override
@@ -60,7 +61,7 @@ class _SettingsPageState extends State<SettingsPage> {
             tooltip: '뒤로가기',
             color: Colors.black,
             onPressed: () {
-              Navigator.pop(context);
+              navigatorKey.currentState?.pop();
             },
           ),
           actions: [
