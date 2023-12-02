@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:travelsync_client_new/models/group.dart';
 import 'package:travelsync_client_new/models/notice.dart';
 import 'package:travelsync_client_new/notice/notice_create.dart';
 import 'package:travelsync_client_new/widgets/header.dart';
@@ -22,9 +23,12 @@ class _NoticePageState extends State<NoticePage> {
   dynamic userKey = '';
   dynamic userInfo;
   List<Notice> noticeList = [];
+  late String? url;
+  late GroupDetail groupdetail;
 
   checkUserState() async {
     userKey = await storage.read(key: 'login');
+    url = await storage.read(key: 'address');
     if (userKey == null) {
       Navigator.pushNamed(context, '/'); // 로그인 페이지로 이동
     } else {
@@ -33,15 +37,71 @@ class _NoticePageState extends State<NoticePage> {
     }
   }
 
-  getNoticeList() async {
+  waitForGroupInfo() async {
     try {
-      final url = 'http://34.83.150.5:8080/notice/${widget.groupId}';
       Map<String, String> header = {
         "accept": "*/*",
         "Authorization": "Bearer ${userInfo["accessToken"]}"
       };
       final response = await http.get(
-        Uri.parse(url),
+          Uri.parse("$url/group/detail/${widget.groupId}"),
+          headers: header);
+      if (response.statusCode == 200) {
+        var responseBody = jsonDecode(response.body);
+        groupdetail = GroupDetail.fromJson(responseBody);
+        userInfo['accountName'] == groupdetail.guide
+            ? isGuide = true
+            : isGuide = false;
+      } else {
+        if (!mounted) return;
+        Future.microtask(() => showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                // return object of type Dialog
+                return AlertDialog(
+                  content: const Text("페이지 로드 중 오류가 발생했습니다."),
+                  actions: <Widget>[
+                    TextButton(
+                      child: const Text("닫기"),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                );
+              },
+            ));
+      }
+    } catch (e) {
+      if (!mounted) return;
+      Future.microtask(() => showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              // return object of type Dialog
+              return AlertDialog(
+                content: const Text("그룹페이지 api(그룹정보)오류"),
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text("닫기"),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              );
+            },
+          ));
+    }
+  }
+
+  getNoticeList() async {
+    try {
+      Map<String, String> header = {
+        "accept": "*/*",
+        "Authorization": "Bearer ${userInfo["accessToken"]}"
+      };
+      final response = await http.get(
+        Uri.parse('$url/notice/${widget.groupId}'),
         headers: header,
       );
       if (response.statusCode == 200) {

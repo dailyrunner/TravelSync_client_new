@@ -23,7 +23,7 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   static const storage = FlutterSecureStorage();
-  final String url = 'http://13.125.88.46:8080';
+  final String url = 'http://34.83.150.5:8080';
 
   saveURL() async {
     await storage.write(key: 'address', value: url);
