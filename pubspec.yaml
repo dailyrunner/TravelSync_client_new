@@ -76,6 +76,7 @@ flutter:
     - assets/images/logo_sentence.png
     - assets/images/airplane_travelsync.png
     - assets/images/group_icon.png
+    - assets/images/edit_icon.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

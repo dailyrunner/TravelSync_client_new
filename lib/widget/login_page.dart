@@ -9,6 +9,7 @@ import 'package:travelsync_client_new/tour/tourListPage.dart';
 import 'package:travelsync_client_new/tour/createTour.dart';
 import 'package:travelsync_client_new/widget/globals.dart';
 import 'package:travelsync_client_new/widget/home_page.dart';
+import 'package:travelsync_client_new/widget/info_change.dart';
 import 'package:travelsync_client_new/widget/join.dart';
 import 'package:travelsync_client_new/widget/login_widget_group.dart';
 import 'package:travelsync_client_new/widget/settings_page.dart';
@@ -28,6 +29,7 @@ class StartingPage extends StatelessWidget {
         '/main/tour/createTour': (context) => const CreateTour(),
         '/main/group': (context) => const GroupCreatePage(),
         '/main/settings': (context) => const SettingsPage(),
+        '/main/settings/infoChange': (context) => const InfoChange(),
       },
       home: const LoginPage(),
     );
@@ -69,7 +71,7 @@ class _LoginPageState extends State<LoginPage> {
 
     // user의 정보가 있다면 로그인 후 들어가는 첫 페이지로 넘어가게 합니다.
     if (userInfo != null) {
-      Navigator.pushNamed(context, '/main');
+      navigatorKey.currentState?.pushNamed('/main');
     }
   }
 
