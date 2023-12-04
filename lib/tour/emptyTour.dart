@@ -26,6 +26,7 @@ class NoTourMessage extends StatelessWidget {
               'assets/images/tour.png',
               height: 100,
             ),
+            const SizedBox(height: 100),
           ],
         ),
       ],

@@ -25,7 +25,7 @@ class StartingPage extends StatelessWidget {
         '/join': (context) => const JoinPage(),
         '/main': (context) => const HomePage(),
         '/main/tour': (context) => const TourListPage(),
-        '/main/tour/createTour': (context) => const CreateTour(),
+        '/main/tour/createTour': (context) => CreateTour(),
         '/main/group': (context) => const GroupCreatePage(),
         '/main/settings': (context) => const SettingsPage(),
       },

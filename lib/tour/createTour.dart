@@ -11,9 +11,6 @@ import '../plan/createPlan.dart';
 // import 'dart:async';
 // import 'dart:convert';
 
-//access token:eyJhbGciOiJIUzUxMiJ9.eyJleHAiOjE3MDM2ODkwMjQsInN1YiI6InN0ckBuYXZlci5jb20iLCJ0eXBlIjoiQUNDRVNTIn0.BiOeGRixTHEdTjL1CW4dQ2tM0QT-rQoJaQm8H2lHwqQtiXgxG4cg4sQDAjI89eI_sC2l2q_rFoJcz_HOmYleXA
-//
-
 class CreateTour extends StatefulWidget {
   const CreateTour({Key? key}) : super(key: key);
   @override

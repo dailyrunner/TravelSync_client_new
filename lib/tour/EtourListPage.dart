@@ -1,11 +1,47 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:travelsync_client_new/logo/airplaneLogo.dart';
-import 'package:travelsync_client_new/tour/tourListView.dart';
+import 'package:travelsync_client_new/tour/emptyTour.dart';
 import 'package:travelsync_client_new/widget/globals.dart';
 import '../../widgets/header.dart';
 
-class TourListPage extends StatelessWidget {
-  const TourListPage({super.key});
+class TourListPage extends StatefulWidget {
+  const TourListPage({Key? key}) : super(key: key);
+
+  @override
+  State<TourListPage> createState() => _TourListPageState();
+}
+
+class _TourListPageState extends State<TourListPage> {
+/*    *    *    *    *    *    *    *    *    */
+  late String url;
+  static const storage =
+      FlutterSecureStorage(); // FlutterSecureStorage를 storage로 저장
+  dynamic userInfo = ''; // storage에 있는 유저 정보를 저장
+
+  //flutter_secure_storage 사용을 위한 초기화 작업
+  @override
+  void initState() {
+    super.initState();
+
+    // 비동기로 flutter secure storage 정보를 불러오는 작업
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _asyncMethod();
+    });
+  }
+
+  _asyncMethod() async {
+    // read 함수로 key값에 맞는 정보를 불러오고 데이터타입은 String 타입
+    // 데이터가 없을때는 null을 반환
+    userInfo = await storage.read(key: 'login');
+    url = (await storage.read(key: 'address'))!;
+
+    // user의 정보가 있다면 로그인 후 들어가는 첫 페이지로 넘어가게 합니다.
+    if (userInfo == null) {
+      Navigator.pushNamed(context, '/');
+    }
+  }
+/*    *    *    *    *    *    *    *    *    */
 
   @override
   Widget build(BuildContext context) {
@@ -37,8 +73,8 @@ class TourListPage extends StatelessWidget {
               const SizedBox(height: 40),
               const Header(textHeader: 'TOUR List'), //title
               const SizedBox(height: 70),
-              const TourListView(),
-              const SizedBox(height: 100),
+              //TourListView(),
+              const NoTourMessage(),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -47,7 +83,10 @@ class TourListPage extends StatelessWidget {
                     child: ElevatedButton(
                       onPressed: () {
                         navigatorKey.currentState
-                            ?.pushNamed('/main/tour/createTour');
+                            ?.pushNamed('/main/tour/createTour')
+                            .then((value) {
+                          setState(() {});
+                        });
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFEFF5FF),
@@ -78,10 +117,7 @@ class TourListPage extends StatelessWidget {
                   SizedBox(
                     width: 160,
                     child: ElevatedButton(
-                      onPressed: () {
-                        navigatorKey.currentState
-                            ?.pushNamed('/main/tour/createTour');
-                      },
+                      onPressed: () {},
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFF5FbFF),
                         shape: RoundedRectangleBorder(
@@ -115,3 +151,14 @@ class TourListPage extends StatelessWidget {
     );
   }
 }
+
+// class TourListView extends StatelessWidget {
+//   const TourListView({Key? key}) : super(key: key);
+
+//   // Widget build(BuildContext context) {
+//   //   Future<List<String>> fetchTourList() async {
+//   //     await Future.delayed(const Duration(seconds: 2));
+//   //     return [];
+//   //   }
+//   // }
+// }
