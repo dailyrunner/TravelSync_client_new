@@ -286,7 +286,6 @@ class GroupCreatePageState extends State<GroupCreatePage> {
             },
           ),
         ),
-        backgroundColor: const Color(0xFFF5FBFF),
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(20.0),

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:intl/intl.dart';
 import 'package:travelsync_client_new/group/group_main_page.dart';
 import 'package:travelsync_client_new/widgets/header.dart';
 import 'package:http/http.dart' as http;
@@ -47,24 +48,26 @@ class _NoticeCreatePageState extends State<NoticeCreatePage> {
   void searchLocation() {}
   createNotice() async {
     try {
-      String finalTime = DateTime(
-              _setDate.year, _setDate.month, _setDate.day, _setHour, _setMinute)
-          .toIso8601String();
+      String finalTime = DateFormat('yyyy-MM-dd hh:mm').format(DateTime(
+          _setDate.year, _setDate.month, _setDate.day, _setHour, _setMinute));
       Map<String, dynamic> data = {
         'groupId': widget.groupId,
         'noticeDate': finalTime,
         'noticeTitle': noticeTitleController.text,
-        'noticeLatitude': 0,
-        'noticeLongitude': 0,
+        'noticeLatitude': 0.0,
+        'noticeLongitude': 0.0,
       };
       var body = json.encode(data);
       final response = await http.post(Uri.parse("$url/notice"),
-          headers: {"accept": "*/*", "Content-Type": "application/json"},
+          headers: {
+            "accept": "*/*",
+            "Authorization": "Bearer ${userInfo["accessToken"]}",
+            "Content-Type": "application/json"
+          },
           body: body);
       if (response.statusCode == 200) {
         if (!mounted) return;
         var responseBody = jsonDecode(response.body);
-        int groupId = responseBody["groupId"];
         showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -81,7 +84,7 @@ class _NoticeCreatePageState extends State<NoticeCreatePage> {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  GroupMainPage(groupId: groupId)));
+                                  GroupMainPage(groupId: widget.groupId)));
                     });
                   },
                 ),

@@ -108,12 +108,9 @@ class _NoticePageState extends State<NoticePage> {
       );
       if (response.statusCode == 200) {
         final notices = jsonDecode(response.body);
-        if (notices == null) {
-          noticeExist = false;
-          return;
-        }
         for (var notice in notices) {
           noticeList.add(Notice.fromJson(notice));
+          noticeExist = true;
         }
       } else {
         print('error');
@@ -188,45 +185,107 @@ class _NoticePageState extends State<NoticePage> {
                         Column(
                           children: [
                             const Text(
-                              "예정된 알림",
+                              "알림 목록",
                               style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
                             SizedBox(
-                              height: 160,
+                              height: 500,
                               child: ListView.separated(
                                 scrollDirection: Axis.vertical,
                                 itemCount: noticeList.length,
                                 itemBuilder: (context, index) {
                                   var notice = noticeList[index];
-
-                                  return NoticeButton(
-                                      notice: notice,
-                                      onPressed: () {
-                                        NoticeCreatePage(
-                                            groupId: widget.groupId);
-                                      },
-                                      buttonColor: const Color(0xFFF5FBFF),
-                                      width: 160.0);
+                                  return Container(
+                                    width: 160,
+                                    height: 62,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                    child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                        ),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                const Column(
+                                                  children: [
+                                                    Text(
+                                                      "위치",
+                                                      style: TextStyle(
+                                                        fontSize: 18,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ),
+                                                    ),
+                                                    SizedBox(height: 4),
+                                                    Text(
+                                                      "시간",
+                                                      style: TextStyle(
+                                                        fontSize: 18,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                Padding(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 6,
+                                                      vertical: 8),
+                                                  child: Container(
+                                                    width: 1,
+                                                    height: 42,
+                                                    color: Colors.black,
+                                                  ),
+                                                ),
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      notice.noticeTitle,
+                                                      style: const TextStyle(
+                                                        fontSize: 18,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 4),
+                                                    Text(
+                                                      "${notice.parseHour()}:${notice.parseMinute()}",
+                                                      style: const TextStyle(
+                                                        fontSize: 18,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                            if (notice.noticeLatitude != 0 &&
+                                                notice.noticeLongitude != 0)
+                                              const Icon(Icons.location_on)
+                                          ],
+                                        )),
+                                  );
                                 },
                                 separatorBuilder: (context, index) =>
                                     const SizedBox(
                                   height: 5,
                                 ),
                               ),
-                            ),
-                            const Text(
-                              "이전 알림",
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 320,
-                              child: SingleChildScrollView(),
                             ),
                           ],
                         ),

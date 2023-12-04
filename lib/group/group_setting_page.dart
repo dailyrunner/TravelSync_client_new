@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:travelsync_client_new/widget/globals.dart';
 import 'package:travelsync_client_new/widget/home_page.dart';
 import 'package:travelsync_client_new/widgets/header.dart';
 import 'package:http/http.dart' as http;
@@ -17,8 +18,8 @@ class GroupSettingPage extends StatefulWidget {
 }
 
 class _GroupSettingPageState extends State<GroupSettingPage> {
-  late bool isGuide = true;
-  bool _isLocationShareEnabled = false;
+  late bool isGuide;
+  late bool _isLocationShareEnabled;
   late int groupPassword = 3355;
   late String groupURL = "travelsync.com/chohs";
   static const storage = FlutterSecureStorage();
@@ -28,24 +29,72 @@ class _GroupSettingPageState extends State<GroupSettingPage> {
   late String? url;
 
   void importTour() {}
-  updateGroupSetting() {
-    try {} catch (e) {
-      Error();
-    }
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-              content: const Text("설정을 변경했습니다."),
+  updateGroupSetting() async {
+    try {
+      Map<String, dynamic> data = {
+        'groupId': widget.groupId,
+        'guide': groupdetail.guide,
+        'groupName': groupdetail.groupName,
+        'startDate': groupdetail.startDate,
+        'endDate': groupdetail.endDate,
+        'nation': groupdetail.nation,
+        'tourCompany': groupdetail.tourCompany,
+        'toggleLoc': _isLocationShareEnabled,
+        'tourId': 0
+      };
+      var body = json.encode(data);
+      final response = await http.put(Uri.parse("$url/group/setting"),
+          headers: {
+            "accept": "*/*",
+            "Authorization": "Bearer ${userInfo["accessToken"]}",
+            "Content-Type": "application/json"
+          },
+          body: body);
+      if (response.statusCode == 200) {
+        if (!mounted) return;
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            // return object of type Dialog
+            return AlertDialog(
+              content: const Text("설정 변경 완료"),
               actions: <Widget>[
                 TextButton(
-                  child: const Text("확인"),
+                  child: const Text("닫기"),
                   onPressed: () {
                     Navigator.pop(context);
                   },
-                )
-              ]);
-        });
+                ),
+              ],
+            );
+          },
+        );
+
+        return;
+      } else {
+        if (!mounted) return;
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            // return object of type Dialog
+            return AlertDialog(
+              content: const Text("http 통신 오류"),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text("닫기"),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            );
+          },
+        );
+        return;
+      }
+    } catch (e) {
+      Error();
+    }
   }
 
   leaveGroupAlert() {
@@ -100,11 +149,8 @@ class _GroupSettingPageState extends State<GroupSettingPage> {
                 TextButton(
                   child: const Text("닫기"),
                   onPressed: () {
-                    Navigator.pop(context);
-                    Future.microtask(() => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const HomePage())));
+                    navigatorKey.currentState?.pop();
+                    navigatorKey.currentState?.pushNamed('/main');
                   },
                 ),
               ],
@@ -283,6 +329,7 @@ class _GroupSettingPageState extends State<GroupSettingPage> {
         userInfo['accountName'] == groupdetail.guide
             ? isGuide = true
             : isGuide = false;
+        _isLocationShareEnabled = groupdetail.toggleLoc;
       } else {
         if (!mounted) return;
         Future.microtask(() => showDialog(
