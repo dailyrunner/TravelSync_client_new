@@ -10,7 +10,7 @@ class CheckValidate {
       RegExp regExp = RegExp(pattern);
       if (!regExp.hasMatch(value)) {
         focusNode.requestFocus();
-        return '특수문자 포함 10자 이상으로 입력하세요.';
+        return '알파벳, 숫자, 특수문자 포함 10자이상';
       } else {
         return null;
       }
@@ -36,6 +36,44 @@ class CheckValidate {
     if (value.isEmpty) {
       focusNode.requestFocus();
       return '휴대폰 번호를 입력하세요.';
+    } else {
+      if (value.length != 11) {
+        focusNode.requestFocus();
+        return '휴대폰 번호를 올바르게 입력하세요.';
+      } else {
+        return null;
+      }
+    }
+  }
+
+  String? validateChangePassword(FocusNode focusNode, String value) {
+    if (value.isEmpty) {
+      return null;
+    } else {
+      String pattern = r'^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[$@$!%*#?&]).{10,}$';
+      RegExp regExp = RegExp(pattern);
+      if (!regExp.hasMatch(value)) {
+        focusNode.requestFocus();
+        return '알파벳, 숫자, 특수문자 포함 10자 이상';
+      } else {
+        return null;
+      }
+    }
+  }
+
+  String? validateChangeSamePassword(
+      FocusNode focusNode, String value1, String value2) {
+    if (value1 != value2) {
+      focusNode.requestFocus();
+      return '비밀번호와 동일하게 입력해주세요.';
+    } else {
+      return null;
+    }
+  }
+
+  String? validateChangePhoneNum(FocusNode focusNode, String value) {
+    if (value.isEmpty) {
+      return null;
     } else {
       if (value.length != 11) {
         focusNode.requestFocus();
