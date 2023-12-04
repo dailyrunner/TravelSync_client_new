@@ -72,16 +72,13 @@ class _JoinPageState extends State<JoinPage> {
         String result = response.data;
 
         if (result.compareTo('already exists') == 0) {
-          print('중복 아이디 있음');
           checkSameId = false;
           return false;
         } else {
-          print('아이디 사용가능');
           checkSameId = true;
           return true;
         }
       } else {
-        print('error');
         return false;
       }
     } catch (e) {
@@ -153,7 +150,6 @@ class _JoinPageState extends State<JoinPage> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      scaffoldMessengerKey: snackbarKey,
       home: Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
@@ -269,43 +265,49 @@ class _JoinPageState extends State<JoinPage> {
                       },
                     ),
                   ),
-                  ElevatedButton(
-                    onPressed: () async {
-                      validateEmail(_emailFocus, userId.text);
-                      if (checkUserId) {
-                        await idCheck(userId.text);
-                        if (checkSameId) {
-                          const SnackBar snackBar = SnackBar(
-                            content: Text("사용할 수 있는 이메일 입니다."),
-                            duration: Duration(seconds: 1),
-                          );
-                          snackbarKey.currentState?.showSnackBar(snackBar);
-                        } else {
-                          const SnackBar snackBar = SnackBar(
-                            content: Text("사용할 수 없는 이메일 입니다."),
-                            duration: Duration(seconds: 1),
-                          );
-                          snackbarKey.currentState?.showSnackBar(snackBar);
+                  Builder(builder: (context) {
+                    return ElevatedButton(
+                      onPressed: () async {
+                        validateEmail(_emailFocus, userId.text);
+                        if (checkUserId) {
+                          await idCheck(userId.text);
+                          if (checkSameId) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('사용할 수 있는 이메일입니다.'),
+                                duration: Duration(
+                                    seconds: 1), // SnackBar가 표시되는 시간 설정
+                              ),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('사용할 수 없는 이메일입니다.'),
+                                duration: Duration(
+                                    seconds: 1), // SnackBar가 표시되는 시간 설정
+                              ),
+                            );
+                          }
                         }
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(20, 35),
-                      foregroundColor: Colors.black,
-                      backgroundColor: const Color(0xFFF5FBFF), // 텍스트 색상
-                      shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(10), // 모서리를 둥글게 할지 여부
+                      },
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(20, 35),
+                        foregroundColor: Colors.black,
+                        backgroundColor: const Color(0xFFF5FBFF), // 텍스트 색상
+                        shape: RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.circular(10), // 모서리를 둥글게 할지 여부
+                        ),
                       ),
-                    ),
-                    child: const Text(
-                      '중복 확인',
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
+                      child: const Text(
+                        '중복 확인',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
-                    ),
-                  ),
+                    );
+                  }),
                 ],
               ),
               Row(
@@ -333,7 +335,7 @@ class _JoinPageState extends State<JoinPage> {
                         keyboardType: TextInputType.visiblePassword,
                         obscureText: true,
                         decoration: _textFormDecoration(
-                            '비밀번호', '특수문자 포함 10자 이상으로 입력하세요.'),
+                            '비밀번호', '알파벳, 숫자, 특수문자 포함 10자이상'),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return '값을 입력하세요.';
@@ -444,45 +446,51 @@ class _JoinPageState extends State<JoinPage> {
               Container(
                 height: 40,
               ),
-              ElevatedButton(
-                onPressed: () async {
-                  joinReadyCheck();
-                  if (formKey.currentState!.validate() && joinReady) {
-                    if (await submitJoin(userName.text, userId.text,
-                            password.text, phoneNum.text) ==
-                        true) {
-                      navigatorKey.currentState?.pushNamed('/');
+              Builder(builder: (context) {
+                return ElevatedButton(
+                  onPressed: () async {
+                    joinReadyCheck();
+                    if (formKey.currentState!.validate() && joinReady) {
+                      if (await submitJoin(userName.text, userId.text,
+                              password.text, phoneNum.text) ==
+                          true) {
+                        navigatorKey.currentState?.pushNamed('/');
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('회원가입에 실패했습니다.'),
+                            duration:
+                                Duration(seconds: 1), // SnackBar가 표시되는 시간 설정
+                          ),
+                        );
+                      }
                     } else {
-                      const SnackBar snackBar = SnackBar(
-                        content: Text("회원가입에 실패했습니다."),
-                        duration: Duration(seconds: 1),
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('올바르게 기입 후 다시 시도하세요.'),
+                          duration:
+                              Duration(seconds: 1), // SnackBar가 표시되는 시간 설정
+                        ),
                       );
-                      snackbarKey.currentState?.showSnackBar(snackBar);
                     }
-                  } else {
-                    const SnackBar snackBar = SnackBar(
-                      content: Text("올바르게 기입 후 다시 시도하세요."),
-                      duration: Duration(seconds: 1),
-                    );
-                    snackbarKey.currentState?.showSnackBar(snackBar);
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(150, 50),
-                  foregroundColor: Colors.black,
-                  backgroundColor: const Color(0xFFF5FBFF), // 텍스트 색상
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10), // 모서리를 둥글게 할지 여부
+                  },
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(150, 50),
+                    foregroundColor: Colors.black,
+                    backgroundColor: const Color(0xFFF5FBFF), // 텍스트 색상
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10), // 모서리를 둥글게 할지 여부
+                    ),
                   ),
-                ),
-                child: const Text(
-                  '가입하기',
-                  style: TextStyle(
-                    fontSize: 25,
-                    fontWeight: FontWeight.w700,
+                  child: const Text(
+                    '가입하기',
+                    style: TextStyle(
+                      fontSize: 25,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
-                ),
-              ),
+                );
+              }),
             ],
           ),
         ),
