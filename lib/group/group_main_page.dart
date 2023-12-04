@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:travelsync_client_new/group/group_setting_page.dart';
 import 'package:travelsync_client_new/models/group.dart';
+import 'package:travelsync_client_new/models/notice.dart';
 import 'package:travelsync_client_new/notice/notice_page.dart';
 import 'package:travelsync_client_new/widgets/header.dart';
 import 'package:http/http.dart' as http;
@@ -17,9 +18,10 @@ class GroupMainPage extends StatefulWidget {
 }
 
 class _GroupMainPageState extends State<GroupMainPage> {
-  late bool isGuide;
+  late bool isGuide, noticeExist;
   late GroupDetail groupdetail;
   late GuideInfo guideInfo;
+  List<Notice> noticeList = [];
   static const storage = FlutterSecureStorage();
   dynamic userKey = '';
   dynamic userInfo;
@@ -60,7 +62,7 @@ class _GroupMainPageState extends State<GroupMainPage> {
           Uri.parse("$url/group/detail/${widget.groupId}"),
           headers: header);
       if (response.statusCode == 200) {
-        var responseBody = jsonDecode(response.body);
+        var responseBody = jsonDecode(utf8.decode(response.bodyBytes));
         groupdetail = GroupDetail.fromJson(responseBody);
         await waitForGuideInfo();
       } else {
@@ -115,11 +117,12 @@ class _GroupMainPageState extends State<GroupMainPage> {
           Uri.parse('$url/user/info/${groupdetail.guide}'),
           headers: header);
       if (response.statusCode == 200) {
-        var responseBody = jsonDecode(response.body);
+        var responseBody = jsonDecode(utf8.decode(response.bodyBytes));
         guideInfo = GuideInfo.fromJson(responseBody);
         userInfo['accountName'] == groupdetail.guide
             ? isGuide = true
             : isGuide = false;
+        await waitForNotice();
       } else {
         if (!mounted) return;
         Future.microtask(() => showDialog(
@@ -159,6 +162,30 @@ class _GroupMainPageState extends State<GroupMainPage> {
               );
             },
           ));
+    }
+  }
+
+  waitForNotice() async {
+    try {
+      Map<String, String> header = {
+        "accept": "*/*",
+        "Authorization": "Bearer ${userInfo["accessToken"]}"
+      };
+      final response = await http.get(
+        Uri.parse('$url/notice/${widget.groupId}'),
+        headers: header,
+      );
+      if (response.statusCode == 200) {
+        final notices = jsonDecode(response.body);
+        for (var notice in notices) {
+          noticeList.add(Notice.fromJson(notice));
+          noticeExist = true;
+        }
+      } else {
+        print('error');
+      }
+    } catch (e) {
+      throw Error();
     }
   }
 
@@ -224,7 +251,7 @@ class _GroupMainPageState extends State<GroupMainPage> {
                         textHeader: "Group Main",
                       ),
                       const SizedBox(
-                        height: 50,
+                        height: 20,
                       ),
                       Text(
                         groupdetail.tourCompany,
@@ -283,20 +310,6 @@ class _GroupMainPageState extends State<GroupMainPage> {
                             ),
                           ),
                         ),
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      const Row(
-                        children: [
-                          Text(
-                            "함께하는 여행객 - 임성혁님 외 22명",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
                       ),
                       const SizedBox(
                         height: 20,
@@ -395,20 +408,106 @@ class _GroupMainPageState extends State<GroupMainPage> {
                                   width: 5,
                                 ),
                                 // notice API 받아올시 Container 안에 넣어서 리스트 띄우기
-                                const SingleChildScrollView(
-                                  child: Column(
-                                    children: [
-                                      Text(
-                                        "작성된 투어가 없습니다.\n새로운 투어를 가져와보세요!",
-                                        textAlign: TextAlign.justify,
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w600,
+                                SingleChildScrollView(
+                                  child: ListView.separated(
+                                    scrollDirection: Axis.vertical,
+                                    itemCount: noticeList.length,
+                                    itemBuilder: (context, index) {
+                                      var notice = noticeList[index];
+                                      return Container(
+                                        width: 160,
+                                        height: 62,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          border: Border.all(
+                                            color: Colors.black,
+                                          ),
                                         ),
-                                      ),
-                                      SizedBox(
-                                        height: 200,
-                                      ),
-                                    ],
+                                        child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 16,
+                                            ),
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    const Column(
+                                                      children: [
+                                                        Text(
+                                                          "위치",
+                                                          style: TextStyle(
+                                                            fontSize: 18,
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                          ),
+                                                        ),
+                                                        SizedBox(height: 4),
+                                                        Text(
+                                                          "시간",
+                                                          style: TextStyle(
+                                                            fontSize: 18,
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    Padding(
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          horizontal: 6,
+                                                          vertical: 8),
+                                                      child: Container(
+                                                        width: 1,
+                                                        height: 42,
+                                                        color: Colors.black,
+                                                      ),
+                                                    ),
+                                                    Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          notice.noticeTitle,
+                                                          style:
+                                                              const TextStyle(
+                                                            fontSize: 18,
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                          ),
+                                                        ),
+                                                        const SizedBox(
+                                                            height: 4),
+                                                        Text(
+                                                          "${notice.parseHour()}:${notice.parseMinute()}",
+                                                          style:
+                                                              const TextStyle(
+                                                            fontSize: 18,
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                                if (notice.noticeLatitude !=
+                                                        0 &&
+                                                    notice.noticeLongitude != 0)
+                                                  const Icon(Icons.location_on)
+                                              ],
+                                            )),
+                                      );
+                                    },
+                                    separatorBuilder: (context, index) =>
+                                        const SizedBox(
+                                      height: 5,
+                                    ),
                                   ),
                                 ),
                               ],
