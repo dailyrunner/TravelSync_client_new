@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:travelsync_client_new/models/plan.dart';
+import 'package:travelsync_client_new/models/tour.dart';
 import '../tour/emptyTour.dart';
 
 class TourListView extends StatefulWidget {
@@ -10,8 +12,11 @@ class TourListView extends StatefulWidget {
 }
 
 class _TourListViewState extends State<TourListView> {
-  late String url;
+  late Tour tour;
+  late Plan plan;
 
+  /*    *    *    *    *    *    *    *    *    */
+  late String url;
   // FlutterSecureStorage를 storage로 저장
   dynamic userInfo = '';
   // storage에 있는 유저 정보를 저장
@@ -34,6 +39,7 @@ class _TourListViewState extends State<TourListView> {
       Navigator.pushNamed(context, '/');
     }
   }
+/*    *    *    *    *    *    *    *    *    */
 
   @override
   Widget build(BuildContext context) {
