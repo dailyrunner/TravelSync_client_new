@@ -7,15 +7,15 @@ import 'package:travelsync_client_new/logo/airplaneLogo.dart';
 import 'package:travelsync_client_new/widget/globals.dart';
 import 'package:travelsync_client_new/widgets/header.dart';
 
-class ShowLocation extends StatefulWidget {
-  const ShowLocation({super.key});
+class GuideLocation extends StatefulWidget {
+  const GuideLocation({super.key});
 
   @override
-  State<ShowLocation> createState() => ShowLocationState();
+  State<GuideLocation> createState() => GuideLocationState();
 }
 
 //처음 켤 때 사용자 위치 지정하는 함수, 사용자 현재 위치로 구현하고자 한다.
-class ShowLocationState extends State<ShowLocation> {
+class GuideLocationState extends State<GuideLocation> {
   final Completer<GoogleMapController> _controller = Completer();
   final Set<Marker> _markers = {};
   late Timer _updateTimer;
