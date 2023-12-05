@@ -2,27 +2,38 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:travelsync_client_new/logo/airplaneLogo.dart';
+import 'package:travelsync_client_new/models/plan.dart';
+import 'package:travelsync_client_new/plan/createPlanBox.dart';
 import 'package:travelsync_client_new/widget/globals.dart';
 import '../widgets/header.dart';
-import '../plan/createPlan.dart';
 
 //////API/////
-// import 'package:http/http.dart' as http;
-// import 'dart:async';
-// import 'dart:convert';
+import 'package:travelsync_client_new/models/tour.dart';
+import 'package:http/http.dart' as http;
+import 'dart:async';
+import 'dart:convert';
 
 class CreateTour extends StatefulWidget {
-  const CreateTour({Key? key}) : super(key: key);
+  CreateTour({Key? key}) : super(key: key);
+  // int tourId = 0;
+  Tour realTour = Tour(0, '로딩중', '로딩중');
+  //
+  Plan realPlan = Plan(0, 0, 0, '로딩중', '로딩중', '로딩중');
+
   @override
   State<CreateTour> createState() => CreateTourState();
 }
 
+/* * * * * * 투어 부분 * * * * * */
+var dayCount = 1;
+var selectedDay;
+int tourId = 0;
+
 class CreateTourState extends State<CreateTour> {
   final TextEditingController tourNameController = TextEditingController();
   final TextEditingController tourCompanyController = TextEditingController();
-  int dayCount = 1;
-  var selectedDay = 1;
-  //
+
+  /*    *    *    *    *    *    *    *    *    */
   late String url;
   static const storage =
       FlutterSecureStorage(); // FlutterSecureStorage를 storage로 저장
@@ -42,17 +53,190 @@ class CreateTourState extends State<CreateTour> {
     // 데이터가 없을때는 null을 반환
     userInfo = await storage.read(key: 'login');
     url = (await storage.read(key: 'address'))!;
+    userInfo = jsonDecode(userInfo);
     // user의 정보가 있다면 로그인 후 들어가는 첫 페이지로 넘어가게 합니다.
     if (userInfo == null) {
       Navigator.pushNamed(context, '/');
     }
   }
-  //
+  /*    *    *    *    *    *    *    *    *    */
 
-  void _addDay() {
+  void createtour() async {
+    if (tourNameController.text.isEmpty) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          // return object of type Dialog
+          return AlertDialog(
+            content: const Text("TOUR을 입력해주세요."),
+            actions: <Widget>[
+              TextButton(
+                child: const Text("닫기"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+    if (tourCompanyController.text.isEmpty) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          // return object of type Dialog
+          return AlertDialog(
+            content: const Text("여행사를 입력해주세요."),
+            actions: <Widget>[
+              TextButton(
+                child: const Text("닫기"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+    try {
+      Map<String, dynamic> data = {
+        'tourName': tourNameController.text,
+        'tourCompany': tourCompanyController.text,
+      };
+      var body = json.encode(data);
+      final response = await http.post(Uri.parse('$url/tour'),
+          headers: {
+            "accept": "*/*",
+            "Authorization": "Bearer ${userInfo["accessToken"]}",
+            "Content-Type": "application/json"
+          },
+          body: body);
+
+      // 요청이 성공했는지 확인 (상태 코드 200)
+      if (response.statusCode == 200) {
+        if (!mounted) return;
+        dynamic responseBody = jsonDecode(response.body);
+        setState(() {
+          tourId = responseBody["tourId"]; // tourId 설정
+          print(tourId);
+        });
+        print('성공 tourId: $tourId');
+
+        // 응답 바디에서 TourID 추출
+        // TourID와 무언가를 수행, 예를 들면 출력하거나 저장하기
+      } else {
+        // 요청이 실패한 경우 에러 처리
+        print('여행 생성 실패. 상태 코드: ${response.statusCode}');
+        print('응답 바디: ${response.body}');
+      }
+    } catch (error) {
+      // API 요청 중 발생한 예외 처리
+      print('여행 생성 오류: $error');
+    }
+  }
+
+/* * * * * 플랜부분 * * * * */
+
+  _addDay() {
     setState(() {
       dayCount++;
     });
+  }
+
+/* * */
+  final TextEditingController plantitleController = TextEditingController();
+  final TextEditingController plantimeController = TextEditingController();
+  final TextEditingController plancontentController = TextEditingController();
+  var planId = 0;
+  var selectedDay = 1;
+
+  /*앞서 선언된 곳은 없애줌*/
+
+  String _formatTime(String time) {
+    DateTime parsedTime = DateTime.parse("2022-01-01 $time:00");
+    return "${parsedTime.hour.toString().padLeft(2, '0')}:${parsedTime.minute.toString().padLeft(2, '0')}";
+  }
+
+  void createplan() async {
+    if (plantitleController.text.isEmpty) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          // return object of type Dialog
+          return AlertDialog(
+            content: const Text("Plan장소를 입력해주세요."),
+            actions: <Widget>[
+              TextButton(
+                child: const Text("닫기"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+    if (plantimeController.text.isEmpty) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          // return object of type Dialog
+          return AlertDialog(
+            content: const Text("Plan시간을 입력해주세요."),
+            actions: <Widget>[
+              TextButton(
+                child: const Text("닫기"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+    try {
+      Map<String, dynamic> data = {
+        "tourId": tourId,
+        "day": selectedDay,
+        'planTitle': plantitleController.text,
+        'time': _formatTime(plantimeController.text),
+        'planContent': plancontentController.text,
+      };
+
+      var body = json.encode(data);
+      final response = await http.post(Uri.parse('$url/plan'),
+          headers: {
+            "accept": "*/*",
+            "Authorization": "Bearer ${userInfo["accessToken"]}",
+            "Content-Type": "application/json"
+          },
+          body: body);
+
+      // 요청이 성공했는지 확인 (상태 코드 200)
+      if (response.statusCode == 200) {
+        if (!mounted) return;
+        dynamic responseBody = jsonDecode(response.body);
+        setState(() {
+          planId = responseBody["planId"]; // tourId 설정
+          print(planId);
+        });
+        print('성공: $planId');
+
+        // 응답 바디에서 TourID 추출
+        // TourID와 무언가를 수행, 예를 들면 출력하거나 저장하기
+      } else {
+        // 요청이 실패한 경우 에러 처리
+        print('플랜 생성 실패. 상태 코드: ${response.statusCode}');
+        print('응답 바디: ${response.body}');
+      }
+    } catch (error) {
+      // API 요청 중 발생한 예외 처리
+      print('플랜 생성 오류: $error');
+    }
   }
 
   @override
@@ -83,10 +267,74 @@ class CreateTourState extends State<CreateTour> {
             const SizedBox(height: 20),
             const Header(textHeader: 'Create TOUR'),
             const SizedBox(height: 30),
-            const TourName(),
-            const SizedBox(height: 20),
+            Row(
+              children: [
+                const Padding(
+                  padding: EdgeInsets.only(left: 30),
+                  child: Text(
+                    'TOUR 이름      ',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      fontFamily: 'Inter',
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: 200,
+                  child: TextField(
+                    controller: tourNameController,
+                    decoration: const InputDecoration(
+                      hintText: '일본 도쿄 투어',
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 5),
+            Row(
+              children: [
+                const Padding(
+                  padding: EdgeInsets.only(left: 66),
+                  child: Text(
+                    '여행사      ',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      fontFamily: 'Inter',
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: 200,
+                  child: TextField(
+                    controller: tourCompanyController,
+                    decoration: const InputDecoration(
+                      hintText: '하나 투어',
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: 60,
+                  child: TextButton(
+                    onPressed: (createtour),
+                    child: const Text(
+                      "확인",
+                      style: TextStyle(
+                        color: Colors.blue,
+                        fontSize: 16,
+                        fontFamily: "Inter",
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
             const SizedBox(
-              width: 386,
+              width: 384,
               child: Divider(
                 thickness: 2.0,
                 color: Color.fromARGB(255, 187, 214, 255),
@@ -142,14 +390,186 @@ class CreateTourState extends State<CreateTour> {
               ),
             ),
             const SizedBox(
-              width: 386,
+              width: 384,
               child: Divider(
                 thickness: 2.0,
                 color: Color.fromARGB(255, 187, 214, 255),
               ),
             ),
-            const SizedBox(height: 12),
-            PlanCreatePage(dayCount: selectedDay)
+            /* 플랜 값 받는 중 */
+            Column(
+              children: [
+                Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20),
+                      child: Container(
+                        width: 60,
+                        alignment: Alignment.center,
+                        margin: const EdgeInsets.symmetric(horizontal: 5),
+                        color: Colors.white,
+                        child: Text(
+                          'Day $selectedDay',
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontSize: 24,
+                            fontWeight: FontWeight.w500,
+                            fontFamily: 'Inter',
+                          ),
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {},
+                      icon: const Icon(
+                        Icons.add_circle_outline,
+                        size: 24,
+                        color: Color.fromARGB(255, 0, 110, 200),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Column(
+                  children: [
+                    Row(
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.only(left: 50),
+                          child: Text(
+                            '시간   ',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: 'Inter',
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: 230,
+                          child: TextField(
+                            controller: plantimeController,
+                            decoration: const InputDecoration(
+                              isDense: true,
+                              hintText: '14:00',
+                              enabledBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(color: Colors.blue),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.only(left: 50),
+                          child: Text(
+                            '장소   ',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: 'Inter',
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: 230,
+                          child: TextField(
+                            controller: plantitleController,
+                            decoration: const InputDecoration(
+                              isDense: true,
+                              hintText: '인천공항 M 창구 미팅',
+                              enabledBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(color: Colors.blue),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    //content
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 340,
+                          height: 180,
+                          alignment: Alignment.topLeft,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(8.0),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Colors.grey,
+                                blurRadius: 1.0,
+                                spreadRadius: 0.8,
+                              ),
+                            ],
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                              left: 16.0,
+                              right: 14.0,
+                              top: 2.0,
+                              bottom: 2.0,
+                            ),
+                            child: TextField(
+                              controller: plancontentController,
+                              maxLines: null,
+                              decoration: const InputDecoration(
+                                hintText: '세부 사항을 입력하세요',
+                                border: InputBorder.none,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                SizedBox(
+                  width: 120,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      createplan();
+                      //navigatorKey.currentState?.pushNamed('/main/tour');
+                    }, //저장하고 다시 TourListPage로 돌아감. 물론 값을 갖고 가야하는디...ㅋㅋㅋ
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFEFF5FF),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      shadowColor: const Color.fromARGB(255, 80, 80, 80)
+                          .withOpacity(0.7),
+                      elevation: 2.0,
+                    ),
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(
+                        vertical: 15,
+                        horizontal: 16,
+                      ),
+                      child: Text(
+                        '일정 추가',
+                        style: TextStyle(
+                          color: Color.fromARGB(255, 80, 80, 80),
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                          fontFamily: 'Inter',
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),
@@ -157,66 +577,43 @@ class CreateTourState extends State<CreateTour> {
   }
 }
 
-class TourName extends StatelessWidget {
-  const TourName({
-    Key? key,
-  }) : super(key: key);
+class chuga extends StatelessWidget {
+  const chuga({
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
-      children: [
-        Row(
-          children: [
-            // SingleChildScrollView(),
-            Padding(
-              padding: EdgeInsets.only(left: 44),
-              child: Text(
-                'TOUR 이름      ',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  fontFamily: 'Inter',
-                ),
-              ),
-            ),
-            SizedBox(
-              width: 220,
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: '일본 도쿄 투어',
-                ),
-              ),
-            ),
-          ],
+    return SizedBox(
+      width: 120,
+      child: ElevatedButton(
+        onPressed: () {
+          navigatorKey.currentState?.pushNamed('/main/tour');
+        }, //저장하고 다시 TourListPage로 돌아감. 물론 값을 갖고 가야하는디...ㅋㅋㅋ
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFFEFF5FF),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          shadowColor: const Color.fromARGB(255, 80, 80, 80).withOpacity(0.7),
+          elevation: 2.0,
         ),
-        SizedBox(height: 5),
-        Row(
-          children: [
-            Padding(
-              padding: EdgeInsets.only(left: 80),
-              child: Text(
-                '여행사      ',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  fontFamily: 'Inter',
-                ),
-              ),
+        child: const Padding(
+          padding: EdgeInsets.symmetric(
+            vertical: 15,
+            horizontal: 16,
+          ),
+          child: Text(
+            '일정 추가',
+            style: TextStyle(
+              color: Color.fromARGB(255, 80, 80, 80),
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
+              fontFamily: 'Inter',
             ),
-            SizedBox(
-              width: 220,
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: '하나 투어',
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
-      ],
+      ),
     );
   }
 }

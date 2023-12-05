@@ -7,8 +7,8 @@ import 'package:travelsync_client_new/tour/tourListPage.dart';
 import 'package:travelsync_client_new/widget/globals.dart';
 
 class PlanCreatePage extends StatefulWidget {
-  PlanCreatePage({Key? key, required this.dayCount}) : super(key: key);
-  var dayCount = 1;
+  PlanCreatePage({Key? key, required this.seletedDay}) : super(key: key);
+  var seletedDay = 1;
   static const storage = FlutterSecureStorage();
   @override
   State<PlanCreatePage> createState() => _PlanCreatePageState();
@@ -81,7 +81,7 @@ class _PlanCreatePageState extends State<PlanCreatePage> {
 
         Map<String, dynamic> PlanCreatePageItem = {
           "tourId": tourId,
-          "day": widget.dayCount,
+          "day": widget.seletedDay,
           "time": {
             "hour": hour,
             "minute": minute,
@@ -111,7 +111,7 @@ class _PlanCreatePageState extends State<PlanCreatePage> {
           children: [
             GestureDetector(
               onTap: () async {
-                await _onDayPressed(widget.dayCount);
+                await _onDayPressed(widget.seletedDay);
               },
               child: Padding(
                 padding: const EdgeInsets.only(left: 20),
@@ -121,7 +121,7 @@ class _PlanCreatePageState extends State<PlanCreatePage> {
                   margin: const EdgeInsets.symmetric(horizontal: 5),
                   color: Colors.white,
                   child: Text(
-                    'Day ${widget.dayCount}',
+                    'Day ${widget.seletedDay}',
                     style: const TextStyle(
                       color: Colors.black,
                       fontSize: 24,
@@ -139,6 +139,8 @@ class _PlanCreatePageState extends State<PlanCreatePage> {
             ),
           ],
         ),
+
+        //planbox
         const SizedBox(height: 12),
 
         //time
@@ -247,7 +249,7 @@ class _PlanCreatePageState extends State<PlanCreatePage> {
           width: 120,
           child: ElevatedButton(
             onPressed: () async {
-              await _onDayPressed(widget.dayCount);
+              await _onDayPressed(widget.seletedDay);
               navigatorKey.currentState?.pushNamed('/main/tour');
             }, //저장하고 다시 TourListPage로 돌아감. 물론 값을 갖고 가야하는디...ㅋㅋㅋ
             style: ElevatedButton.styleFrom(

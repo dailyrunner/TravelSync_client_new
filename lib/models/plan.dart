@@ -2,18 +2,24 @@ class Plan {
   final int planId;
   final int tourId;
   final int day;
-  final String planTime;
+  final String time;
   final String planTitle;
   final String planContent;
 
-  Plan(this.planId, this.planTime, this.planTitle, this.planContent,
-      this.tourId, this.day);
+  Plan(
+    this.planId,
+    this.tourId,
+    this.day,
+    this.time,
+    this.planTitle,
+    this.planContent,
+  );
 
   Plan.fromJson(Map<String, dynamic> json)
       : planId = json['planId'],
         tourId = json['tourId'],
         day = json['day'],
-        planTime = json['planTime'],
+        time = json['time'],
         planTitle = json['planTitle'],
         planContent = json['planContent'];
 }
