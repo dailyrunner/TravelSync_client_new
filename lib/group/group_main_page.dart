@@ -67,8 +67,7 @@ class _GroupMainPageState extends State<GroupMainPage> {
       if (response.statusCode == 200) {
         var responseBody = jsonDecode(utf8.decode(response.bodyBytes));
         groupdetail = GroupDetail.fromJson(responseBody);
-        // await waitForGuideInfo();
-        await waitForNotice();
+        await waitForGuideInfo();
       } else {
         if (!mounted) return;
         Future.microtask(() => showDialog(
@@ -297,7 +296,7 @@ class _GroupMainPageState extends State<GroupMainPage> {
                         children: [
                           const Icon(Icons.person, size: 12),
                           Text(
-                            "가이드 ${guideInfo.name}, ${guideInfo.phone}",
+                            "가이드 ${guideInfo.name} ${guideInfo.phone}",
                             style: const TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
