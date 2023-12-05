@@ -118,6 +118,22 @@ class CreateTourState extends State<CreateTour> {
       if (response.statusCode == 200) {
         if (!mounted) return;
         dynamic responseBody = jsonDecode(response.body);
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              // return object of type Dialog
+              return AlertDialog(
+                content: const Text("Tour 이름과 여행사가 등록되었습니다."),
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text("닫기"),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              );
+            });
         setState(() {
           tourId = responseBody["tourId"]; // tourId 설정
           print(tourId);
@@ -220,6 +236,23 @@ class CreateTourState extends State<CreateTour> {
       if (response.statusCode == 200) {
         if (!mounted) return;
         dynamic responseBody = jsonDecode(response.body);
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              // return object of type Dialog
+              return AlertDialog(
+                content: const Text("일정이 추가되었습니다."),
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text("닫기"),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      navigatorKey.currentState?.pushNamed('/main/tour');
+                    },
+                  ),
+                ],
+              );
+            });
         setState(() {
           planId = responseBody["planId"]; // tourId 설정
           print(planId);
@@ -540,8 +573,8 @@ class CreateTourState extends State<CreateTour> {
                   child: ElevatedButton(
                     onPressed: () {
                       createplan();
-                      //navigatorKey.currentState?.pushNamed('/main/tour');
-                    }, //저장하고 다시 TourListPage로 돌아감. 물론 값을 갖고 가야하는디...ㅋㅋㅋ
+                      navigatorKey.currentState?.pushNamed('/main/tour');
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFEFF5FF),
                       shape: RoundedRectangleBorder(
@@ -571,47 +604,6 @@ class CreateTourState extends State<CreateTour> {
               ],
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class chuga extends StatelessWidget {
-  const chuga({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 120,
-      child: ElevatedButton(
-        onPressed: () {
-          navigatorKey.currentState?.pushNamed('/main/tour');
-        }, //저장하고 다시 TourListPage로 돌아감. 물론 값을 갖고 가야하는디...ㅋㅋㅋ
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFFEFF5FF),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          shadowColor: const Color.fromARGB(255, 80, 80, 80).withOpacity(0.7),
-          elevation: 2.0,
-        ),
-        child: const Padding(
-          padding: EdgeInsets.symmetric(
-            vertical: 15,
-            horizontal: 16,
-          ),
-          child: Text(
-            '일정 추가',
-            style: TextStyle(
-              color: Color.fromARGB(255, 80, 80, 80),
-              fontWeight: FontWeight.w600,
-              fontSize: 14,
-              fontFamily: 'Inter',
-            ),
-          ),
         ),
       ),
     );
