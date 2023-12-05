@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:travelsync_client_new/group/group_invite_page.dart';
 import 'package:travelsync_client_new/group/group_setting_page.dart';
 import 'package:travelsync_client_new/models/group.dart';
 import 'package:travelsync_client_new/models/notice.dart';
@@ -18,7 +19,8 @@ class GroupMainPage extends StatefulWidget {
 }
 
 class _GroupMainPageState extends State<GroupMainPage> {
-  late bool isGuide, noticeExist;
+  late bool isGuide = false;
+  bool noticeExist = false;
   late GroupDetail groupdetail;
   late GuideInfo guideInfo;
   List<Notice> noticeList = [];
@@ -48,6 +50,7 @@ class _GroupMainPageState extends State<GroupMainPage> {
   }
 
   void importPlan() {}
+
   void viewTravlerLocation() {}
   void checkTraveler() {}
   void viewGuideLocation() {}
@@ -64,7 +67,8 @@ class _GroupMainPageState extends State<GroupMainPage> {
       if (response.statusCode == 200) {
         var responseBody = jsonDecode(utf8.decode(response.bodyBytes));
         groupdetail = GroupDetail.fromJson(responseBody);
-        await waitForGuideInfo();
+        // await waitForGuideInfo();
+        await waitForNotice();
       } else {
         if (!mounted) return;
         Future.microtask(() => showDialog(
@@ -123,6 +127,7 @@ class _GroupMainPageState extends State<GroupMainPage> {
             ? isGuide = true
             : isGuide = false;
         await waitForNotice();
+      } else if (response.statusCode == 401) {
       } else {
         if (!mounted) return;
         Future.microtask(() => showDialog(
@@ -176,7 +181,7 @@ class _GroupMainPageState extends State<GroupMainPage> {
         headers: header,
       );
       if (response.statusCode == 200) {
-        final notices = jsonDecode(response.body);
+        final notices = jsonDecode(utf8.decode(response.bodyBytes));
         for (var notice in notices) {
           noticeList.add(Notice.fromJson(notice));
           noticeExist = true;
@@ -292,7 +297,7 @@ class _GroupMainPageState extends State<GroupMainPage> {
                         children: [
                           const Icon(Icons.person, size: 12),
                           Text(
-                            "가이드 ${guideInfo.name} ${guideInfo.phone}",
+                            "가이드 ${guideInfo.name}, ${guideInfo.phone}",
                             style: const TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
@@ -338,6 +343,7 @@ class _GroupMainPageState extends State<GroupMainPage> {
                           const SizedBox(height: 10),
                           SizedBox(
                             height: 150,
+                            width: 336,
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -348,23 +354,129 @@ class _GroupMainPageState extends State<GroupMainPage> {
                                 const SizedBox(
                                   width: 5,
                                 ),
-                                // notice API 받아올시 Container 안에 넣어서 리스트 띄우기
-                                const SingleChildScrollView(
-                                  child: Column(
-                                    children: [
-                                      Text(
-                                        "작성된 공지가 없습니다.\n새로운 공지를 등록해주세요!",
-                                        textAlign: TextAlign.justify,
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 200,
-                                      ),
-                                    ],
+                                if (!noticeExist)
+                                  const Text(
+                                    "작성된 공지가 없습니다.\n새로운 공지를 등록해주세요!",
+                                    textAlign: TextAlign.justify,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
-                                ),
+                                // notice API 받아올시 Container 안에 넣어서 리스트 띄우기
+
+                                if (noticeExist)
+                                  SizedBox(
+                                    width: 320,
+                                    child: ListView.separated(
+                                      scrollDirection: Axis.vertical,
+                                      itemCount: noticeList.length,
+                                      shrinkWrap: true,
+                                      itemBuilder: (context, index) {
+                                        var notice = noticeList[index];
+                                        return Container(
+                                          width: 300,
+                                          height: 62,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                            border: Border.all(
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                          child: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                horizontal: 16,
+                                              ),
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      const Column(
+                                                        children: [
+                                                          Text(
+                                                            "위치",
+                                                            style: TextStyle(
+                                                              fontSize: 18,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                            ),
+                                                          ),
+                                                          SizedBox(height: 4),
+                                                          Text(
+                                                            "시간",
+                                                            style: TextStyle(
+                                                              fontSize: 18,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                                horizontal: 6,
+                                                                vertical: 8),
+                                                        child: Container(
+                                                          width: 1,
+                                                          height: 42,
+                                                          color: Colors.black,
+                                                        ),
+                                                      ),
+                                                      Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            notice.noticeTitle,
+                                                            style:
+                                                                const TextStyle(
+                                                              fontSize: 18,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                              height: 4),
+                                                          Text(
+                                                            "${notice.parseHour()}:${notice.parseMinute()}",
+                                                            style:
+                                                                const TextStyle(
+                                                              fontSize: 18,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  if (notice.noticeLatitude !=
+                                                          0 &&
+                                                      notice.noticeLongitude !=
+                                                          0)
+                                                    const Icon(
+                                                        Icons.location_on)
+                                                ],
+                                              )),
+                                        );
+                                      },
+                                      separatorBuilder: (context, index) =>
+                                          const SizedBox(
+                                        height: 5,
+                                      ),
+                                    ),
+                                  ),
                               ],
                             ),
                           ),
@@ -407,107 +519,18 @@ class _GroupMainPageState extends State<GroupMainPage> {
                                 const SizedBox(
                                   width: 5,
                                 ),
-                                // notice API 받아올시 Container 안에 넣어서 리스트 띄우기
-                                SingleChildScrollView(
-                                  child: ListView.separated(
-                                    scrollDirection: Axis.vertical,
-                                    itemCount: noticeList.length,
-                                    itemBuilder: (context, index) {
-                                      var notice = noticeList[index];
-                                      return Container(
-                                        width: 160,
-                                        height: 62,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                          border: Border.all(
-                                            color: Colors.black,
-                                          ),
+                                // notice List 띄우는 부분
+                                const SingleChildScrollView(
+                                  child: Column(
+                                    children: [
+                                      Text(
+                                        "작성된 투어가 없습니다.\n새로운 투어를 가져와보세요!",
+                                        textAlign: TextAlign.justify,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w600,
                                         ),
-                                        child: Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 16,
-                                            ),
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Row(
-                                                  children: [
-                                                    const Column(
-                                                      children: [
-                                                        Text(
-                                                          "위치",
-                                                          style: TextStyle(
-                                                            fontSize: 18,
-                                                            fontWeight:
-                                                                FontWeight.w600,
-                                                          ),
-                                                        ),
-                                                        SizedBox(height: 4),
-                                                        Text(
-                                                          "시간",
-                                                          style: TextStyle(
-                                                            fontSize: 18,
-                                                            fontWeight:
-                                                                FontWeight.w600,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    Padding(
-                                                      padding: const EdgeInsets
-                                                          .symmetric(
-                                                          horizontal: 6,
-                                                          vertical: 8),
-                                                      child: Container(
-                                                        width: 1,
-                                                        height: 42,
-                                                        color: Colors.black,
-                                                      ),
-                                                    ),
-                                                    Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Text(
-                                                          notice.noticeTitle,
-                                                          style:
-                                                              const TextStyle(
-                                                            fontSize: 18,
-                                                            fontWeight:
-                                                                FontWeight.w600,
-                                                          ),
-                                                        ),
-                                                        const SizedBox(
-                                                            height: 4),
-                                                        Text(
-                                                          "${notice.parseHour()}:${notice.parseMinute()}",
-                                                          style:
-                                                              const TextStyle(
-                                                            fontSize: 18,
-                                                            fontWeight:
-                                                                FontWeight.w600,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ],
-                                                ),
-                                                if (notice.noticeLatitude !=
-                                                        0 &&
-                                                    notice.noticeLongitude != 0)
-                                                  const Icon(Icons.location_on)
-                                              ],
-                                            )),
-                                      );
-                                    },
-                                    separatorBuilder: (context, index) =>
-                                        const SizedBox(
-                                      height: 5,
-                                    ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],

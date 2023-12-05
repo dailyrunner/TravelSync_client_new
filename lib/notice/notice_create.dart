@@ -67,7 +67,7 @@ class _NoticeCreatePageState extends State<NoticeCreatePage> {
           body: body);
       if (response.statusCode == 200) {
         if (!mounted) return;
-        var responseBody = jsonDecode(response.body);
+
         showDialog(
           context: context,
           builder: (BuildContext context) {

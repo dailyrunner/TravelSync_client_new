@@ -3,14 +3,21 @@ import 'package:travelsync_client_new/widget/login_page.dart';
 import 'package:travelsync_client_new/widget/mainloading.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-class AppStart extends StatelessWidget {
+class AppStart extends StatefulWidget {
   const AppStart({super.key});
+  @override
+  State<AppStart> createState() => _AppStartState();
+}
+
+class _AppStartState extends State<AppStart> {
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: SplashScreen(),
-    );
+    return const MaterialApp(home: SplashScreen());
   }
 }
 
