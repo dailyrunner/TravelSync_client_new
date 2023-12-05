@@ -27,8 +27,10 @@ class _GroupSettingPageState extends State<GroupSettingPage> {
   dynamic userInfo;
   late GroupDetail groupdetail;
   late String? url;
+  Future? _groupInfoFuture;
 
   void importTour() {}
+
   updateGroupSetting() async {
     try {
       Map<String, dynamic> data = {
@@ -149,7 +151,7 @@ class _GroupSettingPageState extends State<GroupSettingPage> {
                 TextButton(
                   child: const Text("닫기"),
                   onPressed: () {
-                    navigatorKey.currentState?.pop();
+                    Navigator.pop(context);
                     navigatorKey.currentState?.pushNamed('/main');
                   },
                 ),
@@ -374,145 +376,149 @@ class _GroupSettingPageState extends State<GroupSettingPage> {
 
   @override
   void initState() {
+    // TODO: implement initState
     super.initState();
-    checkUserState();
+    _groupInfoFuture = checkUserState();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (isGuide) {
-      return MaterialApp(
-        home: Scaffold(
-          body: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                children: [
-                  const Header(
-                    textHeader: "Group Settings",
-                  ),
-                  const SizedBox(
-                    height: 50,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return MaterialApp(
+      home: FutureBuilder(
+          future: _groupInfoFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            } else if (snapshot.hasError) {
+              return Center(
+                child: Text("Future Error!\n${snapshot.error}"),
+              );
+            }
+            return Scaffold(
+              body: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
                     children: [
-                      const Text(
-                        "위치 공유 기능",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
+                      const Header(
+                        textHeader: "Group Settings",
+                      ),
+                      if (isGuide)
+                        Column(
+                          children: [
+                            const SizedBox(
+                              height: 50,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  "위치 공유 기능",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                Switch(
+                                  value: _isLocationShareEnabled,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _isLocationShareEnabled = value;
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  "저장된 투어 불러오기",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                ElevatedButton(
+                                  onPressed: importTour,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xfff5fbff),
+                                  ),
+                                  child: const Text(
+                                    "TOUR 불러오기",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            const Text(
+                              "그룹 공유 링크",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            Text("비밀번호:$groupPassword\n$groupURL"),
+                            ElevatedButton(
+                              onPressed: updateGroupSetting,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xfff5fbff),
+                              ),
+                              child: const Text(
+                                "설정 저장",
+                                style: TextStyle(
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            ElevatedButton(
+                              onPressed: deleteGroupAlert,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xfff5fbff),
+                              ),
+                              child: const Text(
+                                "그룹 삭제",
+                                style: TextStyle(
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                      Switch(
-                        value: _isLocationShareEnabled,
-                        onChanged: (value) {
-                          setState(() {
-                            _isLocationShareEnabled = value;
-                          });
-                        },
-                      ),
+                      if (!isGuide)
+                        Column(
+                          children: [
+                            const SizedBox(
+                              height: 50,
+                            ),
+                            TextButton(
+                              onPressed: leaveGroupAlert,
+                              child: const Text("그룹 나가기",
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.w600,
+                                  )),
+                            ),
+                          ],
+                        ),
                     ],
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        "저장된 투어 불러오기",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      ElevatedButton(
-                        onPressed: importTour,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xfff5fbff),
-                        ),
-                        child: const Text(
-                          "TOUR 불러오기",
-                          style: TextStyle(
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  const Text(
-                    "그룹 공유 링크",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  Text("비밀번호:$groupPassword\n$groupURL"),
-                  ElevatedButton(
-                    onPressed: updateGroupSetting,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xfff5fbff),
-                    ),
-                    child: const Text(
-                      "설정 저장",
-                      style: TextStyle(
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  ElevatedButton(
-                    onPressed: deleteGroupAlert,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xfff5fbff),
-                    ),
-                    child: const Text(
-                      "그룹 삭제",
-                      style: TextStyle(
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
-          ),
-        ),
-      );
-    } else {
-      return MaterialApp(
-        home: Scaffold(
-          body: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Header(
-                    textHeader: "Group Settings",
-                  ),
-                  const SizedBox(
-                    height: 50,
-                  ),
-                  TextButton(
-                    onPressed: leaveGroupAlert,
-                    child: const Text("그룹 나가기",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 24,
-                          fontWeight: FontWeight.w600,
-                        )),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      );
-    }
+            );
+          }),
+    );
   }
 }

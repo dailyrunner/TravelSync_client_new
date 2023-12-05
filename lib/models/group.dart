@@ -21,6 +21,23 @@ class GroupDetail {
         tourId = json['tourId'];
 }
 
+class Group {
+  final int groupId;
+  final String guide;
+  final String groupName;
+  final String startDate;
+  final String endDate;
+  final String tourCompany;
+
+  Group.fromJson(Map<String, dynamic> json)
+      : groupId = json['groupId'],
+        guide = json['guide'],
+        groupName = json['groupName'],
+        startDate = json['startDate'],
+        endDate = json['endDate'],
+        tourCompany = json['tourCompany'];
+}
+
 class GuideInfo {
   final String userId;
   final String name;

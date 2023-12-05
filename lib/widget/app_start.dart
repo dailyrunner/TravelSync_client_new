@@ -1,15 +1,53 @@
 import 'package:flutter/material.dart';
+import 'package:travelsync_client_new/group/group_invite_page.dart';
 import 'package:travelsync_client_new/widget/login_page.dart';
 import 'package:travelsync_client_new/widget/mainloading.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:uni_links/uni_links.dart';
 
-class AppStart extends StatelessWidget {
+class AppStart extends StatefulWidget {
   const AppStart({super.key});
+  @override
+  State<AppStart> createState() => _AppStartState();
+}
+
+class _AppStartState extends State<AppStart> {
+  String? _groupId;
+  static const storage = FlutterSecureStorage();
+
+  @override
+  void initState() {
+    super.initState();
+
+    initUniLinks();
+  }
+
+  Future<void> initUniLinks() async {
+    try {
+      // ignore: prefer_const_declarations, unnecessary_nullable_for_final_variable_declarations
+      final String? initialLink =
+          // await getInitialLink();
+          "travelsync://invite/group/5";
+
+      if (initialLink != null) {
+        var uri = Uri.parse(initialLink);
+        if (uri.pathSegments.length == 2 &&
+            uri.pathSegments.first == 'group' &&
+            int.tryParse(uri.pathSegments[1]) != null) {
+          _groupId = uri.pathSegments[1];
+        }
+      }
+    } on Exception {
+      // 에러 처리
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: SplashScreen(),
+    return MaterialApp(
+      home: _groupId == null
+          ? const SplashScreen()
+          : GroupInvitePage(groupId: int.parse(_groupId!)),
     );
   }
 }
