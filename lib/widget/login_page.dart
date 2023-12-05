@@ -11,6 +11,7 @@ import 'package:travelsync_client_new/widget/globals.dart';
 import 'package:travelsync_client_new/widget/home_page.dart';
 import 'package:travelsync_client_new/widget/info_change.dart';
 import 'package:travelsync_client_new/widget/join.dart';
+import 'package:travelsync_client_new/widget/location_templete.dart';
 import 'package:travelsync_client_new/widget/login_widget_group.dart';
 import 'package:travelsync_client_new/widget/settings_page.dart';
 
@@ -30,6 +31,7 @@ class StartingPage extends StatelessWidget {
         '/main/group': (context) => const GroupCreatePage(),
         '/main/settings': (context) => const SettingsPage(),
         '/main/settings/infoChange': (context) => const InfoChange(),
+        '/main/settings/location': (context) => const ShowLocation(),
       },
       home: const LoginPage(),
     );

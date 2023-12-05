@@ -36,11 +36,10 @@ dependencies:
   geolocator: ^10.1.0
   sqflite: ^2.3.0
   http: ^1.1.0
-  flutter_background_service: ^2.4.6
+  background_fetch: ^1.1.6
   google_maps_flutter: ^2.1.7
   flutter_svg: ^1.1.0
-  flutter_polyline_points: ^2.0.0
-  location: ^5.0.3
+
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -76,6 +75,9 @@ flutter:
     - assets/images/airplane_travelsync.png
     - assets/images/group_icon.png
     - assets/images/edit_icon.png
+    - assets/images/Pin_source.png
+    - assets/images/Pin_destination.png
+    - assets/images/Pin_current_location.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
