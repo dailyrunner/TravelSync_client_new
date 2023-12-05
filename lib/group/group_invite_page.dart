@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/intl.dart';
+import 'package:travelsync_client_new/group/group_main_page.dart';
 import 'package:travelsync_client_new/models/group.dart';
+import 'package:travelsync_client_new/widget/globals.dart';
 import 'package:travelsync_client_new/widgets/header.dart';
 import 'package:http/http.dart' as http;
 
@@ -20,137 +22,228 @@ class _GroupInvitePageState extends State<GroupInvitePage> {
   late GroupDetail groupdetail;
   late GuideInfo guideInfo;
   static const storage = FlutterSecureStorage();
-  dynamic userKey = '';
   dynamic userInfo;
 
-  final TextEditingController groupNameController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
-  void acceptJoinGroup() {}
-  void declineJoinGroup() {}
+  void acceptJoinGroup() async {
+    if (passwordController.text.isEmpty) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          // return object of type Dialog
+          return AlertDialog(
+            content: const Text("비밀번호를 입력해주세요."),
+            actions: <Widget>[
+              TextButton(
+                child: const Text("닫기"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+    try {
+      Map<String, dynamic> data = {
+        "groupId": widget.groupId,
+        "groupPassword": passwordController.text
+      };
+      var body = json.encode(data);
+      final response = await http.post(Uri.parse("$url/group/join"),
+          headers: {
+            "accept": "*/*",
+            "Authorization": "Bearer ${userInfo["accessToken"]}",
+            "Content-Type": "application/json"
+          },
+          body: body);
+      if (response.statusCode == 200) {
+        if (!mounted) return;
+        var responseBody = jsonDecode(response.body);
+        int groupId = responseBody["groupId"];
+        Future.microtask(() {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => GroupMainPage(groupId: groupId)));
+        });
+
+        return;
+      } else {
+        if (!mounted) return;
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            // return object of type Dialog
+            return AlertDialog(
+              content: const Text("http 통신 오류"),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text("닫기"),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            );
+          },
+        );
+        return;
+      }
+    } catch (e) {
+      if (!mounted) return;
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          // return object of type Dialog
+          return AlertDialog(
+            content: const Text("api오류"),
+            actions: <Widget>[
+              TextButton(
+                child: const Text("닫기"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  void declineJoinGroup() {
+    navigatorKey.currentState?.pushNamed('/main');
+  }
 
   checkUserState() async {
-    userKey = await storage.read(key: 'login');
-    if (userKey == null) {
-      print("userKey없음");
-    }
-    url = await storage.read(key: 'address');
-    if (userKey == null) {
-      Navigator.pushNamed(context, '/'); // 로그인 페이지로 이동
-    } else {
-      userInfo = jsonDecode(userKey);
-      await waitForGroupInfo();
-    }
-  }
-
-  waitForGroupInfo() async {
     try {
-      Map<String, String> header = {
-        "accept": "*/*",
-        "Authorization": "Bearer ${userInfo["accessToken"]}"
-      };
-      final response = await http.get(
-          Uri.parse("$url/group/detail/${widget.groupId}"),
-          headers: header);
-      if (response.statusCode == 200) {
-        var responseBody = jsonDecode(utf8.decode(response.bodyBytes));
-        groupdetail = GroupDetail.fromJson(responseBody);
-        await waitForGuideInfo();
+      userInfo = await storage.read(key: 'login');
+      url = await storage.read(key: 'address');
+      if (userInfo == null) {
+        Navigator.pushNamed(context, '/'); // 로그인 페이지로 이동
       } else {
-        if (!mounted) return;
-        Future.microtask(() => showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                // return object of type Dialog
-                return AlertDialog(
-                  content: const Text("그룹 정보를 받아오는 중 오류가 발생했습니다."),
-                  actions: <Widget>[
-                    TextButton(
-                      child: const Text("닫기"),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ],
-                );
-              },
-            ));
+        userInfo = jsonDecode(userInfo);
+        // await waitForGroupInfo();
       }
     } catch (e) {
-      if (!mounted) return;
-      Future.microtask(() => showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              // return object of type Dialog
-              return AlertDialog(
-                content: const Text("그룹페이지 api(그룹정보)오류"),
-                actions: <Widget>[
-                  TextButton(
-                    child: const Text("닫기"),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                ],
-              );
-            },
-          ));
+      print("에러");
     }
   }
 
-  waitForGuideInfo() async {
-    try {
-      Map<String, String> header = {
-        "accept": "*/*",
-        "Authorization": "Bearer ${userInfo['accessToken']}"
-      };
-      final response = await http.get(
-          Uri.parse('$url/user/info/${groupdetail.guide}'),
-          headers: header);
-      if (response.statusCode == 200) {
-        var responseBody = jsonDecode(utf8.decode(response.bodyBytes));
-        guideInfo = GuideInfo.fromJson(responseBody);
-      } else {
-        if (!mounted) return;
-        Future.microtask(() => showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                // return object of type Dialog
-                return AlertDialog(
-                  content: const Text("그룹 정보를 받아오는 중 오류가 발생했습니다."),
-                  actions: <Widget>[
-                    TextButton(
-                      child: const Text("닫기"),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ],
-                );
-              },
-            ));
-      }
-    } catch (e) {
-      if (!mounted) return;
-      Future.microtask(() => showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              // return object of type Dialog
-              return AlertDialog(
-                content: const Text("그룹페이지 api(가이드) 오류"),
-                actions: <Widget>[
-                  TextButton(
-                    child: const Text("닫기"),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                ],
-              );
-            },
-          ));
-    }
-  }
-
+  // 그룹에 소속된 사람이 아니면 group/detail/을 불러올 수 없어서 임시 주석처리
+  // waitForGroupInfo() async {
+  //   try {
+  //     Map<String, String> header = {
+  //       "accept": "*/*",
+  //       "Authorization": "Bearer ${userInfo["accessToken"]}"
+  //     };
+  //     final response = await http.get(
+  //         Uri.parse("$url/group/detail/${widget.groupId}"),
+  //         headers: header);
+  //     if (response.statusCode == 200) {
+  //       var responseBody = jsonDecode(utf8.decode(response.bodyBytes));
+  //       groupdetail = GroupDetail.fromJson(responseBody);
+  //       await waitForGuideInfo();
+  //     } else {
+  //       if (!mounted) return;
+  //       Future.microtask(() => showDialog(
+  //             context: context,
+  //             builder: (BuildContext context) {
+  //               // return object of type Dialog
+  //               return AlertDialog(
+  //                 content: const Text("그룹 정보를 받아오는 중 오류가 발생했습니다. groupinfo"),
+  //                 actions: <Widget>[
+  //                   TextButton(
+  //                     child: const Text("닫기"),
+  //                     onPressed: () {
+  //                       Navigator.pop(context);
+  //                     },
+  //                   ),
+  //                 ],
+  //               );
+  //             },
+  //           ));
+  //     }
+  //   } catch (e) {
+  //     if (!mounted) return;
+  //     Future.microtask(() => showDialog(
+  //           context: context,
+  //           builder: (BuildContext context) {
+  //             // return object of type Dialog
+  //             return AlertDialog(
+  //               content: const Text("그룹페이지 api(그룹정보)오류"),
+  //               actions: <Widget>[
+  //                 TextButton(
+  //                   child: const Text("닫기"),
+  //                   onPressed: () {
+  //                     Navigator.pop(context);
+  //                   },
+  //                 ),
+  //               ],
+  //             );
+  //           },
+  //         ));
+  //   }
+  // }
+//
+  // waitForGuideInfo() async {
+  //   try {
+  //     Map<String, String> header = {
+  //       "accept": "*/*",
+  //       "Authorization": "Bearer ${userInfo['accessToken']}"
+  //     };
+  //     final response = await http.get(
+  //         Uri.parse('$url/user/info/${groupdetail.guide}'),
+  //         headers: header);
+  //     if (response.statusCode == 200) {
+  //       var responseBody = jsonDecode(utf8.decode(response.bodyBytes));
+  //       guideInfo = GuideInfo.fromJson(responseBody);
+  //     } else {
+  //       if (!mounted) return;
+  //       Future.microtask(() => showDialog(
+  //             context: context,
+  //             builder: (BuildContext context) {
+  //               // return object of type Dialog
+  //               return AlertDialog(
+  //                 content: const Text("그룹 정보를 받아오는 중 오류가 발생했습니다. guideinfo"),
+  //                 actions: <Widget>[
+  //                   TextButton(
+  //                     child: const Text("닫기"),
+  //                     onPressed: () {
+  //                       Navigator.pop(context);
+  //                     },
+  //                   ),
+  //                 ],
+  //               );
+  //             },
+  //           ));
+  //     }
+  //   } catch (e) {
+  //     if (!mounted) return;
+  //     Future.microtask(() => showDialog(
+  //           context: context,
+  //           builder: (BuildContext context) {
+  //             // return object of type Dialog
+  //             return AlertDialog(
+  //               content: const Text("그룹페이지 api(가이드) 오류"),
+  //               actions: <Widget>[
+  //                 TextButton(
+  //                   child: const Text("닫기"),
+  //                   onPressed: () {
+  //                     Navigator.pop(context);
+  //                   },
+  //                 ),
+  //               ],
+  //             );
+  //           },
+  //         ));
+  //   }
+  // }
+//
   Future<void> wait() async {
     await checkUserState();
   }
@@ -162,6 +255,15 @@ class _GroupInvitePageState extends State<GroupInvitePage> {
         body: FutureBuilder(
             future: wait(),
             builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else if (snapshot.hasError) {
+                return Center(
+                  child: Text("Future Error!\n${snapshot.error}"),
+                );
+              }
               return SingleChildScrollView(
                 child: Padding(
                   padding: const EdgeInsets.all(20.0),
@@ -172,9 +274,11 @@ class _GroupInvitePageState extends State<GroupInvitePage> {
                       const SizedBox(
                         height: 50,
                       ),
-                      Text(
-                        "가이드 ${guideInfo.name}님의 초대장이 도착했어요!",
-                        style: const TextStyle(
+                      const Text(
+                        // 임시
+                        // "가이드 ${guideInfo.name}님의 초대장이 도착했어요!",
+                        "초대장이 도착했어요!",
+                        style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.w600,
                         ),
@@ -191,7 +295,7 @@ class _GroupInvitePageState extends State<GroupInvitePage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const Text(
-                            "투어 이름\n일정\n가이드",
+                            "투어\n일정\n가이드",
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: Colors.indigo,
@@ -208,9 +312,11 @@ class _GroupInvitePageState extends State<GroupInvitePage> {
                               color: Colors.indigo,
                             ),
                           ),
-                          Text(
-                            "${groupdetail.groupName}\n${groupdetail.startDate}~${groupdetail.endDate}\n${guideInfo.name}",
-                            style: const TextStyle(
+                          const Text(
+                            // 임시
+                            //"${groupdetail.groupName}\n${groupdetail.startDate}~${groupdetail.endDate}\n${guideInfo.name}",
+                            "랙",
+                            style: TextStyle(
                               color: Colors.indigo,
                               fontWeight: FontWeight.w600,
                             ),
@@ -220,10 +326,12 @@ class _GroupInvitePageState extends State<GroupInvitePage> {
                       const SizedBox(
                         height: 40,
                       ),
-                      Text(
-                        "${groupdetail.groupName}에\n초대되셨습니다.\n\n초대를 수락 하시겠습니까?",
+                      const Text(
+                        // 임시
+                        // "${groupdetail.groupName}에\n초대되셨습니다.\n\n초대를 수락 하시겠습니까?",
+                        "초대를 수락하시겠습니까?",
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w600,
                         ),
@@ -253,7 +361,7 @@ class _GroupInvitePageState extends State<GroupInvitePage> {
                             Flexible(
                               flex: 3,
                               child: TextField(
-                                controller: groupNameController,
+                                controller: passwordController,
                                 decoration: const InputDecoration(
                                   border: UnderlineInputBorder(),
                                 ),

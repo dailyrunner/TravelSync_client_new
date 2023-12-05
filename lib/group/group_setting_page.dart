@@ -20,8 +20,7 @@ class GroupSettingPage extends StatefulWidget {
 class _GroupSettingPageState extends State<GroupSettingPage> {
   late bool isGuide;
   late bool _isLocationShareEnabled;
-  late int groupPassword = 3355;
-  late String groupURL = "travelsync.com/chohs";
+  late String inviteCode;
   static const storage = FlutterSecureStorage();
   dynamic userKey = '';
   dynamic userInfo;
@@ -332,6 +331,8 @@ class _GroupSettingPageState extends State<GroupSettingPage> {
             ? isGuide = true
             : isGuide = false;
         _isLocationShareEnabled = groupdetail.toggleLoc;
+        inviteCode = '${groupdetail.tourCompany}/${groupdetail.groupId}';
+        inviteCode = base64Encode(utf8.encode(inviteCode));
       } else {
         if (!mounted) return;
         Future.microtask(() => showDialog(
@@ -459,14 +460,14 @@ class _GroupSettingPageState extends State<GroupSettingPage> {
                               height: 20,
                             ),
                             const Text(
-                              "그룹 공유 링크",
+                              "그룹 초대 코드",
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
                               ),
                               textAlign: TextAlign.center,
                             ),
-                            Text("비밀번호:$groupPassword\n$groupURL"),
+                            Text(inviteCode),
                             ElevatedButton(
                               onPressed: updateGroupSetting,
                               style: ElevatedButton.styleFrom(

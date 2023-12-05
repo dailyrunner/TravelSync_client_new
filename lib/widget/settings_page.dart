@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert'; // JSON Encode, Decode를 위한 패키지
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:travelsync_client_new/group/group_invite_page.dart';
 import 'package:travelsync_client_new/logo/airplaneLogo.dart';
 import 'package:travelsync_client_new/models/userinfo.dart';
 import 'package:travelsync_client_new/widget/globals.dart';
@@ -22,6 +23,7 @@ class _SettingsPageState extends State<SettingsPage> {
   dynamic userKey = ''; // storage에 있는 유저 정보를 저장
   dynamic userInfo = '';
   UserInfo realUserInfo = UserInfo('로딩중.....', '로딩중...', '로딩중.......');
+  TextEditingController inviteCodeController = TextEditingController();
 
   @override
   void initState() {
@@ -105,6 +107,61 @@ class _SettingsPageState extends State<SettingsPage> {
   logout() async {
     await storage.delete(key: 'login');
     navigatorKey.currentState?.pushNamed('/');
+  }
+
+  checkInviteCode() async {
+    if (inviteCodeController.text.isEmpty) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          // return object of type Dialog
+          return AlertDialog(
+            content: const Text("초대 코드를 입력해주세요."),
+            actions: <Widget>[
+              TextButton(
+                child: const Text("닫기"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+    String decoded = utf8.decode(base64Decode(inviteCodeController.text));
+    List<String> parts = decoded.split('/');
+    int? groupId = int.tryParse(parts.last);
+    if (groupId == null) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          // return object of type Dialog
+          return AlertDialog(
+            content: const Text("잘못된 코드입니다."),
+            actions: <Widget>[
+              TextButton(
+                child: const Text("닫기"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+    Future.microtask(
+      () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => GroupInvitePage(
+            groupId: groupId!,
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -327,6 +384,7 @@ class _SettingsPageState extends State<SettingsPage> {
             Container(
               height: 50,
             ),
+            // !
             const Text(
               '다른계정이 있으신가요?',
               style: TextStyle(
@@ -416,6 +474,77 @@ class _SettingsPageState extends State<SettingsPage> {
                           fontSize: 22,
                         ),
                       ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Container(
+              height: 40,
+            ),
+            Container(
+              alignment: Alignment.center,
+              padding: const EdgeInsets.only(
+                bottom: 5,
+              ),
+              decoration: const BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    color: Colors.grey,
+                    width: 2.0,
+                  ),
+                ),
+              ),
+              width: 90,
+              child: const Text(
+                '그룹 가입',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 22,
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            SizedBox(
+              width: 150,
+              child: TextField(
+                controller: inviteCodeController,
+                decoration: const InputDecoration(
+                  hintText: '초대 코드 입력',
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            SizedBox(
+              width: 120,
+              child: ElevatedButton(
+                onPressed: checkInviteCode,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFEFF5FF),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  shadowColor:
+                      const Color.fromARGB(255, 80, 80, 80).withOpacity(0.7),
+                  elevation: 2.0,
+                ),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(
+                    vertical: 15,
+                    horizontal: 16,
+                  ),
+                  child: Text(
+                    'Join',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
                     ),
                   ),
                 ),

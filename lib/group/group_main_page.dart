@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:travelsync_client_new/group/group_invite_page.dart';
 import 'package:travelsync_client_new/group/group_setting_page.dart';
 import 'package:travelsync_client_new/models/group.dart';
 import 'package:travelsync_client_new/models/notice.dart';
@@ -18,7 +19,7 @@ class GroupMainPage extends StatefulWidget {
 }
 
 class _GroupMainPageState extends State<GroupMainPage> {
-  late bool isGuide;
+  late bool isGuide = false;
   bool noticeExist = false;
   late GroupDetail groupdetail;
   late GuideInfo guideInfo;
@@ -49,6 +50,7 @@ class _GroupMainPageState extends State<GroupMainPage> {
   }
 
   void importPlan() {}
+
   void viewTravlerLocation() {}
   void checkTraveler() {}
   void viewGuideLocation() {}
@@ -65,7 +67,8 @@ class _GroupMainPageState extends State<GroupMainPage> {
       if (response.statusCode == 200) {
         var responseBody = jsonDecode(utf8.decode(response.bodyBytes));
         groupdetail = GroupDetail.fromJson(responseBody);
-        await waitForGuideInfo();
+        // await waitForGuideInfo();
+        await waitForNotice();
       } else {
         if (!mounted) return;
         Future.microtask(() => showDialog(
@@ -124,6 +127,7 @@ class _GroupMainPageState extends State<GroupMainPage> {
             ? isGuide = true
             : isGuide = false;
         await waitForNotice();
+      } else if (response.statusCode == 401) {
       } else {
         if (!mounted) return;
         Future.microtask(() => showDialog(
@@ -293,7 +297,7 @@ class _GroupMainPageState extends State<GroupMainPage> {
                         children: [
                           const Icon(Icons.person, size: 12),
                           Text(
-                            "가이드 ${guideInfo.name} ${guideInfo.phone}",
+                            "가이드 ${guideInfo.name}, ${guideInfo.phone}",
                             style: const TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
