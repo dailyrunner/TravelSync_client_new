@@ -126,7 +126,6 @@ class _GroupMainPageState extends State<GroupMainPage> {
             ? isGuide = true
             : isGuide = false;
         await waitForNotice();
-      } else if (response.statusCode == 401) {
       } else {
         if (!mounted) return;
         Future.microtask(() => showDialog(
