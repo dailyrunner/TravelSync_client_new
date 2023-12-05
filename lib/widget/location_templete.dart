@@ -21,8 +21,6 @@ class ShowLocationState extends State<ShowLocation> {
   late Timer _updateTimer;
   late Position userPosition;
 
-  late LatLng currentLocation;
-
   static const CameraPosition mylocation = CameraPosition(
     target: LatLng(37.5584, 126.9971),
     zoom: 14.5,
