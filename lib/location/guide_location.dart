@@ -5,23 +5,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:travelsync_client_new/group/group_main_page.dart';
 import 'package:travelsync_client_new/logo/airplaneLogo.dart';
+import 'package:travelsync_client_new/models/locationinfo.dart';
 import 'package:travelsync_client_new/models/userinfo.dart';
 import 'package:travelsync_client_new/widget/globals.dart';
 import 'package:travelsync_client_new/widgets/header.dart';
 import 'package:http/http.dart' as http;
 
-class AllLocation extends StatefulWidget {
-  const AllLocation({super.key});
+class GuideLocation extends StatefulWidget {
+  const GuideLocation({super.key});
 
   @override
-  State<AllLocation> createState() => AllLocationState();
+  State<GuideLocation> createState() => GuideLocationState();
 }
 
 //처음 켤 때 사용자 위치 지정하는 함수, 사용자 현재 위치로 구현하고자 한다.
-class AllLocationState extends State<AllLocation> {
+class GuideLocationState extends State<GuideLocation> {
   final Completer<GoogleMapController> _controller = Completer();
-  List<Marker> markers = [];
+  final Set<Marker> _markers = {};
   late Timer _updateTimer;
   late Position userPosition;
 
@@ -34,6 +36,7 @@ class AllLocationState extends State<AllLocation> {
   dynamic groupId = '';
 
   UserInfo realUserInfo = UserInfo('로딩중.....', '로딩중...', '로딩중.......');
+  LocationInfo realLocationInfo = LocationInfo('로딩중..', '로딩중..', 0, 0);
 
   _asyncMethod() async {
     // read 함수로 key값에 맞는 정보를 불러오고 데이터타입은 String 타입
@@ -58,7 +61,36 @@ class AllLocationState extends State<AllLocation> {
     );
 
     await putUserLocation();
-    await getAllLocation();
+    await getGuideLocation();
+
+    // 마커 설정
+    Marker userMarker = Marker(
+      markerId: const MarkerId('userMarker'),
+      position: LatLng(userPosition.latitude, userPosition.longitude),
+      infoWindow: InfoWindow(
+        title: '현 위치',
+        snippet: '${realUserInfo.name}님',
+      ),
+    );
+
+    Marker serverMarker = Marker(
+      markerId: const MarkerId('serverMarker'),
+      position: LatLng(realLocationInfo.latitude, realLocationInfo.longitude),
+      infoWindow: InfoWindow(
+        title: '가이드 위치',
+        snippet: '${realLocationInfo.userName}님',
+      ),
+      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+    );
+
+    // 마커 갱신
+    if (mounted) {
+      setState(() {
+        _markers.clear();
+        _markers.add(userMarker);
+        _markers.add(serverMarker);
+      });
+    }
 
     // 지도를 사용자의 위치로 이동
     GoogleMapController controller = await _controller.future;
@@ -99,7 +131,13 @@ class AllLocationState extends State<AllLocation> {
             tooltip: '뒤로가기',
             color: Colors.black,
             onPressed: () {
-              navigatorKey.currentState?.pop();
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      GroupMainPage(groupId: int.parse(groupId)),
+                ),
+              );
             },
           ),
         ),
@@ -109,7 +147,7 @@ class AllLocationState extends State<AllLocation> {
             Container(
               height: 10,
             ),
-            const Header(textHeader: "전체 위치 조회"),
+            const Header(textHeader: "위치 조회"),
             Container(
               height: 20,
             ),
@@ -125,7 +163,7 @@ class AllLocationState extends State<AllLocation> {
                 onMapCreated: (GoogleMapController controller) {
                   _controller.complete(controller);
                 },
-                markers: Set.from(markers),
+                markers: _markers,
               ),
             ),
           ],
@@ -211,7 +249,7 @@ class AllLocationState extends State<AllLocation> {
     }
   }
 
-  Future<void> getAllLocation() async {
+  getGuideLocation() async {
     try {
       Map<String, String> header = {
         "accept": "*/*",
@@ -219,37 +257,11 @@ class AllLocationState extends State<AllLocation> {
         "Content-Type": "application/json",
       };
 
-      final response = await http
-          .get(Uri.parse("$url/location/member/$groupId"), headers: header);
+      final response = await http.get(Uri.parse("$url/location/guide/$groupId"),
+          headers: header);
       if (response.statusCode == 200) {
-        List<dynamic> data = jsonDecode(utf8.decode(response.bodyBytes));
-        for (var item in data) {
-          double lat = item['latitude'];
-          double lng = item['longitude'];
-          String userName = item['userName'];
-          if (markers.isEmpty) {
-            markers.add(Marker(
-              markerId: MarkerId('marker_${markers.length}'),
-              position: LatLng(lat, lng),
-              infoWindow: InfoWindow(
-                title: '가이드 위치',
-                snippet: '$userName님',
-              ),
-            ));
-          } else {
-            markers.add(Marker(
-              markerId: MarkerId('marker_${markers.length}'),
-              position: LatLng(lat, lng),
-              infoWindow: InfoWindow(
-                title: '여행객 위치',
-                snippet: '$userName님',
-              ),
-              icon: BitmapDescriptor.defaultMarkerWithHue(
-                  BitmapDescriptor.hueBlue),
-            ));
-          }
-        }
-
+        var responseBody = jsonDecode(utf8.decode(response.bodyBytes));
+        realLocationInfo = LocationInfo.fromJson(responseBody);
         setState(() {});
       } else {
         if (!mounted) return;
