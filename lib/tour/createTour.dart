@@ -247,7 +247,7 @@ class CreateTourState extends State<CreateTour> {
                     child: const Text("닫기"),
                     onPressed: () {
                       Navigator.pop(context);
-                      navigatorKey.currentState?.pushNamed('/main/tour');
+                      // navigatorKey.currentState?.pushNamed('/main/tour');
                     },
                   ),
                 ],
@@ -256,6 +256,9 @@ class CreateTourState extends State<CreateTour> {
         setState(() {
           planId = responseBody["planId"]; // tourId 설정
           print(planId);
+          plantitleController.clear();
+          plantimeController.clear();
+          plancontentController.clear();
         });
         print('성공: $planId');
 
@@ -453,7 +456,9 @@ class CreateTourState extends State<CreateTour> {
                       ),
                     ),
                     IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        createplan();
+                      },
                       icon: const Icon(
                         Icons.add_circle_outline,
                         size: 24,
