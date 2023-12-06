@@ -7,9 +7,7 @@ import 'package:travelsync_client_new/group/group_create_page.dart';
 import 'package:travelsync_client_new/models/model.dart';
 import 'package:travelsync_client_new/tour/tourListPage.dart';
 import 'package:travelsync_client_new/tour/createTour.dart';
-import 'package:travelsync_client_new/widget/all_location.dart';
 import 'package:travelsync_client_new/widget/globals.dart';
-import 'package:travelsync_client_new/widget/guide_location.dart';
 import 'package:travelsync_client_new/widget/home_page.dart';
 import 'package:travelsync_client_new/widget/info_change.dart';
 import 'package:travelsync_client_new/widget/join.dart';
@@ -32,8 +30,6 @@ class StartingPage extends StatelessWidget {
         '/main/group': (context) => const GroupCreatePage(),
         '/main/settings': (context) => const SettingsPage(),
         '/main/settings/infoChange': (context) => const InfoChange(),
-        '/main/settings/location': (context) => const GuideLocation(),
-        '/main/settings/locationAll': (context) => const AllLocation(),
       },
       home: const LoginPage(),
     );

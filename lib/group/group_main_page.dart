@@ -4,11 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:travelsync_client_new/group/group_setting_page.dart';
 import 'package:travelsync_client_new/group/notice_location_page.dart';
+import 'package:travelsync_client_new/location/people_check.dart';
 import 'package:travelsync_client_new/models/group.dart';
 import 'package:travelsync_client_new/models/notice.dart';
 import 'package:travelsync_client_new/models/plan.dart';
 import 'package:travelsync_client_new/notice/notice_page.dart';
+import 'package:travelsync_client_new/location/all_location.dart';
 import 'package:travelsync_client_new/widget/globals.dart';
+import 'package:travelsync_client_new/location/guide_location.dart';
 import 'package:travelsync_client_new/widgets/header.dart';
 import 'package:http/http.dart' as http;
 
@@ -52,7 +55,7 @@ class _GroupMainPageState extends State<GroupMainPage> {
                 )));
   }
 
-  void viewTravlerLocation() {
+  void viewTravelerLocation() {
     if (!groupdetail.toggleLoc) {
       showDialog(
         context: context,
@@ -72,6 +75,9 @@ class _GroupMainPageState extends State<GroupMainPage> {
         },
       );
       return;
+    } else {
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => const AllLocation()));
     }
   }
 
@@ -95,6 +101,9 @@ class _GroupMainPageState extends State<GroupMainPage> {
         },
       );
       return;
+    } else {
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => const PeopleCheck()));
     }
   }
 
@@ -118,6 +127,9 @@ class _GroupMainPageState extends State<GroupMainPage> {
         },
       );
       return;
+    } else {
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => const GuideLocation()));
     }
   }
 
@@ -696,7 +708,7 @@ class _GroupMainPageState extends State<GroupMainPage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             ElevatedButton(
-                              onPressed: viewTravlerLocation,
+                              onPressed: viewTravelerLocation,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xfff5fbff),
                               ),

@@ -273,7 +273,7 @@ class _NoticeCreatePageState extends State<NoticeCreatePage> {
                   width: 320,
                   child: GoogleMap(
                       initialCameraPosition: const CameraPosition(
-                          target: LatLng(0, 0), zoom: 11.0),
+                          target: LatLng(37.5610, 126.9933), zoom: 14.0),
                       onTap: getPoint,
                       markers: marker),
                 ),
