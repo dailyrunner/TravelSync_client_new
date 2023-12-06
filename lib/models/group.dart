@@ -1,6 +1,7 @@
 class GroupDetail {
   final int groupId;
   final String guide;
+  final String guideName;
   final String groupName;
   final String startDate;
   final String endDate;
@@ -12,6 +13,7 @@ class GroupDetail {
   GroupDetail.fromJson(Map<String, dynamic> json)
       : groupId = json['groupId'],
         guide = json['guide'],
+        guideName = json['guideName'],
         groupName = json['groupName'],
         startDate = json['startDate'],
         endDate = json['endDate'],
@@ -48,3 +50,5 @@ class GuideInfo {
         name = json['name'],
         phone = json['phone'];
 }
+
+class GroupInviteInfo {}

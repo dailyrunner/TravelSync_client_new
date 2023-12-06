@@ -24,21 +24,20 @@ class _GroupMainPageState extends State<GroupMainPage> {
   bool noticeExist = false;
   bool planExist = false;
   late GroupDetail groupdetail;
-  late GuideInfo guideInfo;
   List<Notice> noticeList = [];
   List<Plan> planList = [];
   static const storage = FlutterSecureStorage();
-  dynamic userKey = '';
-  dynamic userInfo;
+  dynamic userInfo = '';
   late String? url;
 
   checkUserState() async {
-    userKey = await storage.read(key: 'login');
+    userInfo = await storage.read(key: 'login');
     url = await storage.read(key: 'address');
-    if (userKey == null) {
+    if (userInfo == null) {
       Navigator.pushNamed(context, '/'); // 로그인 페이지로 이동
     } else {
-      userInfo = jsonDecode(userKey);
+      userInfo = jsonDecode(userInfo);
+      await storage.write(key: 'groupId', value: widget.groupId.toString());
       await waitForGroupInfo();
     }
   }
@@ -68,7 +67,9 @@ class _GroupMainPageState extends State<GroupMainPage> {
       if (response.statusCode == 200) {
         var responseBody = jsonDecode(utf8.decode(response.bodyBytes));
         groupdetail = GroupDetail.fromJson(responseBody);
-        await waitForGuideInfo();
+        if (groupdetail.guide == userInfo['accountName']) {
+          isGuide = true;
+        }
       } else {
         if (!mounted) return;
         Future.microtask(() => showDialog(
@@ -97,64 +98,6 @@ class _GroupMainPageState extends State<GroupMainPage> {
               // return object of type Dialog
               return AlertDialog(
                 content: const Text("그룹페이지 api(그룹정보)오류"),
-                actions: <Widget>[
-                  TextButton(
-                    child: const Text("닫기"),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                ],
-              );
-            },
-          ));
-    }
-  }
-
-  waitForGuideInfo() async {
-    try {
-      Map<String, String> header = {
-        "accept": "*/*",
-        "Authorization": "Bearer ${userInfo['accessToken']}"
-      };
-      final response = await http.get(
-          Uri.parse('$url/user/info/${groupdetail.guide}'),
-          headers: header);
-      if (response.statusCode == 200) {
-        var responseBody = jsonDecode(utf8.decode(response.bodyBytes));
-        guideInfo = GuideInfo.fromJson(responseBody);
-        userInfo['accountName'] == groupdetail.guide
-            ? isGuide = true
-            : isGuide = false;
-        await waitForNotice();
-      } else {
-        if (!mounted) return;
-        Future.microtask(() => showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                // return object of type Dialog
-                return AlertDialog(
-                  content: const Text("그룹 생성 중 오류가 발생했습니다."),
-                  actions: <Widget>[
-                    TextButton(
-                      child: const Text("닫기"),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ],
-                );
-              },
-            ));
-      }
-    } catch (e) {
-      if (!mounted) return;
-      Future.microtask(() => showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              // return object of type Dialog
-              return AlertDialog(
-                content: const Text("그룹페이지 api(가이드) 오류"),
                 actions: <Widget>[
                   TextButton(
                     child: const Text("닫기"),
@@ -237,7 +180,8 @@ class _GroupMainPageState extends State<GroupMainPage> {
             ),
             tooltip: '뒤로가기',
             color: Colors.black,
-            onPressed: () {
+            onPressed: () async {
+              await storage.delete(key: 'groupId');
               navigatorKey.currentState?.pushNamed('/main');
             },
           ),
@@ -321,7 +265,7 @@ class _GroupMainPageState extends State<GroupMainPage> {
                         children: [
                           const Icon(Icons.person, size: 12),
                           Text(
-                            "가이드 ${guideInfo.name} ${guideInfo.phone}",
+                            "가이드 ${groupdetail.guideName}",
                             style: const TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
@@ -688,9 +632,10 @@ class _GroupMainPageState extends State<GroupMainPage> {
                               ),
                             ),
                           ],
-                        )
-                      else
+                        ),
+                      if (!isGuide)
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             ElevatedButton(
                               onPressed: viewGuideLocation,
