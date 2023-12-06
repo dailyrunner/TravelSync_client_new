@@ -52,9 +52,74 @@ class _GroupMainPageState extends State<GroupMainPage> {
                 )));
   }
 
-  void viewTravlerLocation() {}
-  void checkTraveler() {}
-  void viewGuideLocation() {}
+  void viewTravlerLocation() {
+    if (!groupdetail.toggleLoc) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          // return object of type Dialog
+          return AlertDialog(
+            content: const Text("현재 위치 공유 기능이 꺼져있습니다."),
+            actions: <Widget>[
+              TextButton(
+                child: const Text("닫기"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+  }
+
+  void checkTraveler() {
+    if (!groupdetail.toggleLoc) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          // return object of type Dialog
+          return AlertDialog(
+            content: const Text("현재 위치 공유 기능이 꺼져있습니다."),
+            actions: <Widget>[
+              TextButton(
+                child: const Text("닫기"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+  }
+
+  void viewGuideLocation() {
+    if (!groupdetail.toggleLoc) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          // return object of type Dialog
+          return AlertDialog(
+            content: const Text("현재 위치 공유 기능이 꺼져있습니다."),
+            actions: <Widget>[
+              TextButton(
+                child: const Text("닫기"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+  }
 
   waitForGroupInfo() async {
     try {
