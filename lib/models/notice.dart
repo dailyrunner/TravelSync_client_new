@@ -22,13 +22,21 @@ class Notice {
     return temp.day;
   }
 
-  int parseHour() {
+  String parseHour() {
     DateTime temp = DateTime.parse(noticeDate);
-    return temp.hour;
+    if (temp.hour < 10) {
+      return "0${temp.hour}";
+    } else {
+      return temp.hour.toString();
+    }
   }
 
-  int parseMinute() {
+  String parseMinute() {
     DateTime temp = DateTime.parse(noticeDate);
-    return temp.minute;
+    if (temp.minute < 10) {
+      return "0${temp.minute}";
+    } else {
+      return temp.minute.toString();
+    }
   }
 }

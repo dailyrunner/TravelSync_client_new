@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:travelsync_client_new/group/group_setting_page.dart';
+import 'package:travelsync_client_new/group/notice_location_page.dart';
 import 'package:travelsync_client_new/models/group.dart';
 import 'package:travelsync_client_new/models/notice.dart';
 import 'package:travelsync_client_new/models/plan.dart';
@@ -70,6 +71,7 @@ class _GroupMainPageState extends State<GroupMainPage> {
         if (groupdetail.guide == userInfo['accountName']) {
           isGuide = true;
         }
+        await waitForNotice();
       } else {
         if (!mounted) return;
         Future.microtask(() => showDialog(
@@ -353,18 +355,19 @@ class _GroupMainPageState extends State<GroupMainPage> {
                                             ),
                                           ),
                                           child: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                horizontal: 16,
-                                              ),
-                                              child: Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Row(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 16,
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                SizedBox(
+                                                  width: 238,
+                                                  child: Row(
                                                     children: [
                                                       const Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
                                                         children: [
                                                           Text(
                                                             "위치",
@@ -400,6 +403,9 @@ class _GroupMainPageState extends State<GroupMainPage> {
                                                         ),
                                                       ),
                                                       Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
                                                         crossAxisAlignment:
                                                             CrossAxisAlignment
                                                                 .start,
@@ -430,14 +436,31 @@ class _GroupMainPageState extends State<GroupMainPage> {
                                                       ),
                                                     ],
                                                   ),
-                                                  if (notice.noticeLatitude !=
-                                                          0 &&
-                                                      notice.noticeLongitude !=
-                                                          0)
-                                                    const Icon(
-                                                        Icons.location_on)
-                                                ],
-                                              )),
+                                                ),
+                                                if (notice.noticeLatitude !=
+                                                        0 &&
+                                                    notice.noticeLongitude != 0)
+                                                  IconButton(
+                                                    onPressed: () {
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  NoticeLocationPage(
+                                                                      latitude:
+                                                                          notice
+                                                                              .noticeLatitude,
+                                                                      longitude:
+                                                                          notice
+                                                                              .noticeLongitude)));
+                                                    },
+                                                    icon: const Icon(
+                                                        Icons.location_on,
+                                                        size: 36),
+                                                  ),
+                                              ],
+                                            ),
+                                          ),
                                         );
                                       },
                                       separatorBuilder: (context, index) =>
