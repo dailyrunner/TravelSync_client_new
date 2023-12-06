@@ -31,9 +31,11 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   static const storage = FlutterSecureStorage();
   final String url = 'http://34.83.150.5';
+  final int groupId = 19;
 
   saveURL() async {
     await storage.write(key: 'address', value: url);
+    await storage.write(key: 'groupId', value: groupId.toString());
   }
 
   @override

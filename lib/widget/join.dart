@@ -89,6 +89,8 @@ class _JoinPageState extends State<JoinPage> {
   void joinReadyCheck() {
     if (checkUserId && checkSameId && agree1 && agree2) {
       joinReady = true;
+    } else {
+      joinReady = false;
     }
   }
 
@@ -464,6 +466,14 @@ class _JoinPageState extends State<JoinPage> {
                           ),
                         );
                       }
+                    } else if (formKey.currentState!.validate()) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('약관에 동의해주세요.'),
+                          duration:
+                              Duration(seconds: 1), // SnackBar가 표시되는 시간 설정
+                        ),
+                      );
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
