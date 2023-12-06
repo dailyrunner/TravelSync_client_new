@@ -60,8 +60,8 @@ class _NoticeEditPageState extends State<NoticeEditPage> {
       if (response.statusCode == 200) {
         final notices = jsonDecode(utf8.decode(response.bodyBytes));
         for (var notice in notices) {
-          if (notice['noticeId'] == widget.noticeId) {
-            thisNotice = notice;
+          if (notice["noticeId"] == widget.noticeId) {
+            thisNotice = Notice.fromJson(notice);
             await setInitData();
             break;
           }
@@ -69,7 +69,9 @@ class _NoticeEditPageState extends State<NoticeEditPage> {
       } else {
         print('error');
       }
-    } catch (e) {
+    } catch (e, s) {
+      print("exception: $e\n");
+      print("stack trace: $s\n");
       throw Error();
     }
   }
@@ -91,6 +93,15 @@ class _NoticeEditPageState extends State<NoticeEditPage> {
         body: FutureBuilder(
             future: _noticeInfoFuture,
             builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else if (snapshot.hasError) {
+                return Center(
+                  child: Text("Future Error!\n${snapshot.error}"),
+                );
+              }
               return SingleChildScrollView(
                 child: Padding(
                   padding: const EdgeInsets.all(20.0),
@@ -208,16 +219,29 @@ class _NoticeEditPageState extends State<NoticeEditPage> {
                         ],
                       ),
                       ElevatedButton(
-                          onPressed: editNotice,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xfff5fbff),
+                        onPressed: editNotice,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xfff5fbff),
+                        ),
+                        child: const Text(
+                          "알림 수정",
+                          style: TextStyle(
+                            color: Colors.black,
                           ),
-                          child: const Text(
-                            "알림 수정",
-                            style: TextStyle(
-                              color: Colors.black,
-                            ),
-                          ))
+                        ),
+                      ),
+                      ElevatedButton(
+                        onPressed: editNotice,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xfff5fbff),
+                        ),
+                        child: const Text(
+                          "알림 수정",
+                          style: TextStyle(
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),

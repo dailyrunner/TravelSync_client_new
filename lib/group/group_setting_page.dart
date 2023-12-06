@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:travelsync_client_new/group/group_main_page.dart';
+import 'package:travelsync_client_new/group/tour_import_page.dart';
 import 'package:travelsync_client_new/widget/globals.dart';
 import 'package:travelsync_client_new/widget/home_page.dart';
 import 'package:travelsync_client_new/widgets/header.dart';
@@ -27,8 +29,16 @@ class _GroupSettingPageState extends State<GroupSettingPage> {
   late GroupDetail groupdetail;
   late String? url;
   Future? _groupInfoFuture;
+  late int? _selectedTourId;
 
-  void importTour() {}
+  importTour() async {
+    _selectedTourId = await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => TourImportPage(
+                  userId: userInfo["accountName"],
+                )));
+  }
 
   updateGroupSetting() async {
     try {
@@ -41,7 +51,7 @@ class _GroupSettingPageState extends State<GroupSettingPage> {
         'nation': groupdetail.nation,
         'tourCompany': groupdetail.tourCompany,
         'toggleLoc': _isLocationShareEnabled,
-        'tourId': 0
+        'tourId': _selectedTourId
       };
       var body = json.encode(data);
       final response = await http.put(Uri.parse("$url/group/setting"),
@@ -305,12 +315,12 @@ class _GroupSettingPageState extends State<GroupSettingPage> {
   }
 
   checkUserState() async {
-    userKey = await storage.read(key: 'login');
+    userInfo = await storage.read(key: 'login');
     url = await storage.read(key: 'address');
-    if (userKey == null) {
+    if (userInfo == null) {
       Navigator.pushNamed(context, '/'); // 로그인 페이지로 이동
     } else {
-      userInfo = jsonDecode(userKey);
+      userInfo = jsonDecode(userInfo);
       await waitForGroupInfo();
     }
   }
@@ -325,12 +335,13 @@ class _GroupSettingPageState extends State<GroupSettingPage> {
           Uri.parse("$url/group/detail/${widget.groupId}"),
           headers: header);
       if (response.statusCode == 200) {
-        var responseBody = jsonDecode(response.body);
+        var responseBody = jsonDecode(utf8.decode(response.bodyBytes));
         groupdetail = GroupDetail.fromJson(responseBody);
         userInfo['accountName'] == groupdetail.guide
             ? isGuide = true
             : isGuide = false;
         _isLocationShareEnabled = groupdetail.toggleLoc;
+        _selectedTourId = groupdetail.tourId;
         inviteCode = '${groupdetail.tourCompany}/${groupdetail.groupId}';
         inviteCode = base64Encode(utf8.encode(inviteCode));
       } else {
@@ -398,6 +409,29 @@ class _GroupSettingPageState extends State<GroupSettingPage> {
               );
             }
             return Scaffold(
+              appBar: AppBar(
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                leading: IconButton(
+                  icon: const Icon(
+                    Icons.arrow_back,
+                    size: 30,
+                  ),
+                  tooltip: '뒤로가기',
+                  color: Colors.black,
+                  onPressed: () {
+                    Future.microtask(() {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              GroupMainPage(groupId: groupdetail.groupId),
+                        ),
+                      );
+                    });
+                  },
+                ),
+              ),
               body: SingleChildScrollView(
                 child: Padding(
                   padding: const EdgeInsets.all(20.0),
