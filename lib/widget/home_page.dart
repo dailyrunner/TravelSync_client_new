@@ -7,6 +7,7 @@ import 'package:travelsync_client_new/logo/airplaneLogo.dart';
 import 'package:travelsync_client_new/models/group.dart';
 import 'package:travelsync_client_new/widget/globals.dart';
 import 'package:http/http.dart' as http;
+import 'package:travelsync_client_new/widgets/header.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -82,7 +83,7 @@ class _HomePageState extends State<HomePage> {
               icon: const Icon(Icons.settings_outlined),
               tooltip: 'settings',
               color: Colors.black,
-              iconSize: 40,
+              iconSize: 45,
             ),
           ],
         ),
@@ -90,33 +91,14 @@ class _HomePageState extends State<HomePage> {
           children: [
             const airplaneLogo(),
             Container(
-              height: 15,
+              height: 20,
             ),
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Joined Group',
-                  style: TextStyle(
-                    fontSize: 35,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ],
-            ),
-            Container(
-              height: 5,
-            ),
-            Container(
-              height: 2.0, // 줄의 높이
-              width: 250.0, // 줄의 가로 길이
-              color: Colors.grey, // 줄의 색상
-            ),
+            const Header(textHeader: 'Joined Group'),
             Container(
               height: 15,
             ),
             SizedBox(
-              height: 450,
+              height: 460,
               child: FutureBuilder(
                   future: wait(),
                   builder: (context, snapshot) {
@@ -192,17 +174,23 @@ class _HomePageState extends State<HomePage> {
                               });
                             },
                             child: Container(
-                              height: 90,
+                              width: 372,
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: Colors.black,
-                                ),
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color.fromARGB(255, 80, 80, 80)
+                                        .withOpacity(0.5),
+                                    blurRadius: 2.0,
+                                    spreadRadius: 1,
+                                    offset: const Offset(1, 1.5),
+                                  ),
+                                ],
                               ),
                               child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                  ),
+                                  padding: const EdgeInsets.only(
+                                      top: 12, bottom: 8, left: 30, right: 30),
                                   child: Column(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
@@ -211,21 +199,26 @@ class _HomePageState extends State<HomePage> {
                                         children: [
                                           const Column(
                                             children: [
-                                              Icon(Icons.flag_rounded,
-                                                  size: 20),
+                                              Icon(Icons.flag_outlined,
+                                                  size: 24,
+                                                  color: Colors.black),
                                               SizedBox(height: 4),
-                                              Icon(Icons.calendar_month,
-                                                  size: 20),
+                                              Icon(
+                                                  Icons.calendar_month_outlined,
+                                                  size: 24,
+                                                  color: Colors.black),
                                               SizedBox(height: 4),
-                                              Icon(Icons.person, size: 20),
+                                              Icon(Icons.person_outlined,
+                                                  size: 24,
+                                                  color: Colors.black),
                                             ],
                                           ),
                                           Padding(
                                             padding: const EdgeInsets.symmetric(
-                                                horizontal: 6, vertical: 8),
+                                                horizontal: 10, vertical: 5),
                                             child: Container(
-                                              width: 1,
-                                              height: 68,
+                                              width: 2,
+                                              height: 74,
                                               color: Colors.black,
                                             ),
                                           ),
@@ -239,24 +232,30 @@ class _HomePageState extends State<HomePage> {
                                               Text(
                                                 "${group.groupName} | ${group.tourCompany}",
                                                 style: const TextStyle(
-                                                  fontSize: 18,
+                                                  fontSize: 16,
                                                   fontWeight: FontWeight.w600,
+                                                  fontFamily: 'Inter',
+                                                  color: Colors.black,
                                                 ),
                                               ),
                                               const SizedBox(height: 4),
                                               Text(
                                                 "${group.startDate} ~ ${group.endDate}",
                                                 style: const TextStyle(
-                                                  fontSize: 18,
+                                                  fontSize: 16,
                                                   fontWeight: FontWeight.w600,
+                                                  fontFamily: 'Inter',
+                                                  color: Colors.black,
                                                 ),
                                               ),
                                               const SizedBox(height: 4),
                                               Text(
                                                 "가이드 ${group.guide}",
                                                 style: const TextStyle(
-                                                  fontSize: 18,
+                                                  fontSize: 16,
                                                   fontWeight: FontWeight.w600,
+                                                  fontFamily: 'Inter',
+                                                  color: Colors.black,
                                                 ),
                                               ),
                                             ],
@@ -284,13 +283,16 @@ class _HomePageState extends State<HomePage> {
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(280, 45),
                 backgroundColor: const Color(0xFFF5FBFF),
+                shadowColor:
+                    const Color.fromARGB(255, 80, 80, 80).withOpacity(0.7),
+                elevation: 2.0,
               ),
               child: const Text(
                 '투어 생성하기',
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 15,
                   fontWeight: FontWeight.w800,
-                  color: Colors.grey,
+                  color: Colors.black,
                 ),
               ),
             ),
@@ -306,14 +308,16 @@ class _HomePageState extends State<HomePage> {
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(280, 45),
                 backgroundColor: const Color(0xFFF5FBFF),
+                shadowColor:
+                    const Color.fromARGB(255, 80, 80, 80).withOpacity(0.7),
+                elevation: 2.0,
               ),
               child: const Text(
                 '그룹 생성하기',
                 style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.grey,
-                ),
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.black),
               ),
             ),
           ],

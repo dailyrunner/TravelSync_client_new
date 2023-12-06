@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:travelsync_client_new/group/group_main_page.dart';
+import 'package:travelsync_client_new/logo/airplaneLogo.dart';
 import 'package:travelsync_client_new/widgets/header.dart';
 import 'package:http/http.dart' as http;
 
@@ -286,193 +287,213 @@ class GroupCreatePageState extends State<GroupCreatePage> {
             },
           ),
         ),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              children: [
-                const Header(
-                  textHeader: "Build Group",
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(40),
-                  child: Column(
+        backgroundColor: Colors.white,
+        body: Column(
+          children: [
+            const airplaneLogo(),
+            const SizedBox(height: 20),
+            const Header(
+              textHeader: "Build Group",
+            ),
+            Padding(
+              padding: const EdgeInsets.all(40),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Flexible(
-                            flex: 3,
-                            child: Text(
-                              "그룹 이름",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                          Flexible(
-                            flex: 5,
-                            child: TextField(
-                              controller: groupNameController,
-                              decoration: const InputDecoration(
-                                border: UnderlineInputBorder(),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Flexible(
-                            flex: 3,
-                            child: Text(
-                              "여행 기간",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                          Flexible(
-                              flex: 5,
-                              child: Column(
-                                children: [
-                                  Row(
-                                    children: [
-                                      Text(
-                                        "${selectedStartDate.toLocal()}"
-                                            .split(' ')[0],
-                                        textAlign: TextAlign.center,
-                                      ),
-                                      IconButton(
-                                        icon: const Icon(Icons.calendar_today),
-                                        onPressed: () =>
-                                            _selectStartDate(context),
-                                      ),
-                                    ],
-                                  ),
-                                  Row(
-                                    children: [
-                                      Text(
-                                        "${selectedEndDate.toLocal()}"
-                                            .split(' ')[0],
-                                        textAlign: TextAlign.center,
-                                      ),
-                                      IconButton(
-                                        icon: const Icon(Icons.calendar_today),
-                                        onPressed: () =>
-                                            _selectEndDate(context),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ))
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Flexible(
-                            flex: 3,
-                            child: Text(
-                              "여행 국가",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                          Flexible(
-                            flex: 5,
-                            child: TextField(
-                              controller: nationController,
-                              decoration: const InputDecoration(
-                                border: UnderlineInputBorder(),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Flexible(
-                            flex: 3,
-                            child: Text(
-                              "여행사",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                          Flexible(
-                            flex: 5,
-                            child: TextField(
-                              controller: tourCompanyController,
-                              decoration: const InputDecoration(
-                                border: UnderlineInputBorder(),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const Text(
-                        "그룹 생성을 누르시면\n가이드 권한으로 그룹이 생성되어\n함께할 여행객을 초대할 수 있습니다.",
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.indigo,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Flexible(
-                            flex: 3,
-                            child: Text(
-                              "비밀번호",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                          Flexible(
-                            flex: 5,
-                            child: TextField(
-                              controller: groupPasswordController,
-                              obscureText: true,
-                              decoration: const InputDecoration(
-                                border: UnderlineInputBorder(),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      ElevatedButton(
-                        onPressed: createGroup,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xfff5fbff),
-                        ),
-                        child: const Text(
-                          "그룹 생성",
+                      const Flexible(
+                        flex: 3,
+                        child: Text(
+                          "그룹 이름   ",
                           style: TextStyle(
-                            color: Colors.black,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      Flexible(
+                        flex: 5,
+                        child: TextField(
+                          controller: groupNameController,
+                          decoration: const InputDecoration(
+                            border: UnderlineInputBorder(),
                           ),
                         ),
                       ),
                     ],
                   ),
-                ),
-              ],
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Flexible(
+                        flex: 3,
+                        child: Text(
+                          "여행 기간   ",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      Flexible(
+                          flex: 5,
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    "${selectedStartDate.toLocal()}"
+                                        .split(' ')[0],
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.calendar_today),
+                                    onPressed: () => _selectStartDate(context),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    "${selectedEndDate.toLocal()}"
+                                        .split(' ')[0],
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.calendar_today),
+                                    onPressed: () => _selectEndDate(context),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ))
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Flexible(
+                        flex: 3,
+                        child: Text(
+                          "여행 국가   ",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      Flexible(
+                        flex: 5,
+                        child: TextField(
+                          controller: nationController,
+                          decoration: const InputDecoration(
+                            border: UnderlineInputBorder(),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Flexible(
+                        flex: 3,
+                        child: Text(
+                          "여행사   ",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      Flexible(
+                        flex: 5,
+                        child: TextField(
+                          controller: tourCompanyController,
+                          decoration: const InputDecoration(
+                            border: UnderlineInputBorder(),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Flexible(
+                        flex: 3,
+                        child: Text(
+                          "비밀번호   ",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      Flexible(
+                        flex: 5,
+                        child: TextField(
+                          controller: groupPasswordController,
+                          obscureText: true,
+                          decoration: const InputDecoration(
+                            border: UnderlineInputBorder(),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  const Text(
+                    "그룹 생성을 누르시면\n가이드 권한으로 그룹이 생성되어\n함께할 여행객을 초대할 수 있습니다.",
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Color(0xff003257),
+                      fontWeight: FontWeight.w600,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  ElevatedButton(
+                    onPressed: createGroup,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFEFF5FF),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      shadowColor: const Color.fromARGB(255, 80, 80, 80)
+                          .withOpacity(0.7),
+                      elevation: 2.0,
+                    ),
+                    child: const Padding(
+                      padding:
+                          EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                      child: Text(
+                        '그룹 생성',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
