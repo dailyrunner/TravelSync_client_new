@@ -2,11 +2,12 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:travelsync_client_new/group/group_invite_page.dart';
 import 'package:travelsync_client_new/group/group_setting_page.dart';
 import 'package:travelsync_client_new/models/group.dart';
 import 'package:travelsync_client_new/models/notice.dart';
+import 'package:travelsync_client_new/models/plan.dart';
 import 'package:travelsync_client_new/notice/notice_page.dart';
+import 'package:travelsync_client_new/widget/globals.dart';
 import 'package:travelsync_client_new/widgets/header.dart';
 import 'package:http/http.dart' as http;
 
@@ -21,9 +22,11 @@ class GroupMainPage extends StatefulWidget {
 class _GroupMainPageState extends State<GroupMainPage> {
   late bool isGuide = false;
   bool noticeExist = false;
+  bool planExist = false;
   late GroupDetail groupdetail;
   late GuideInfo guideInfo;
   List<Notice> noticeList = [];
+  List<Plan> planList = [];
   static const storage = FlutterSecureStorage();
   dynamic userKey = '';
   dynamic userInfo;
@@ -48,8 +51,6 @@ class _GroupMainPageState extends State<GroupMainPage> {
                   groupId: widget.groupId,
                 )));
   }
-
-  void importPlan() {}
 
   void viewTravlerLocation() {}
   void checkTraveler() {}
@@ -184,6 +185,31 @@ class _GroupMainPageState extends State<GroupMainPage> {
           noticeList.add(Notice.fromJson(notice));
           noticeExist = true;
         }
+        await waitForPlanList();
+      } else {
+        print('error');
+      }
+    } catch (e) {
+      throw Error();
+    }
+  }
+
+  waitForPlanList() async {
+    try {
+      Map<String, String> header = {
+        "accept": "*/*",
+        "Authorization": "Bearer ${userInfo["accessToken"]}"
+      };
+      final response = await http.get(
+        Uri.parse('$url/plan/${groupdetail.tourId}'),
+        headers: header,
+      );
+      if (response.statusCode == 200) {
+        final plans = jsonDecode(utf8.decode(response.bodyBytes));
+        for (var plan in plans) {
+          planList.add(Plan.fromJson(plan));
+          planExist = true;
+        }
       } else {
         print('error');
       }
@@ -212,7 +238,7 @@ class _GroupMainPageState extends State<GroupMainPage> {
             tooltip: '뒤로가기',
             color: Colors.black,
             onPressed: () {
-              Navigator.pop(context);
+              navigatorKey.currentState?.pushNamed('/main');
             },
           ),
           actions: [
@@ -332,10 +358,11 @@ class _GroupMainPageState extends State<GroupMainPage> {
                               const SizedBox(
                                 width: 5,
                               ),
-                              IconButton(
-                                onPressed: goNoticePage,
-                                icon: const Icon(Icons.search),
-                              ),
+                              if (isGuide)
+                                IconButton(
+                                  onPressed: goNoticePage,
+                                  icon: const Icon(Icons.search),
+                                ),
                             ],
                           ),
                           const SizedBox(height: 10),
@@ -485,9 +512,9 @@ class _GroupMainPageState extends State<GroupMainPage> {
                       ),
                       Column(
                         children: [
-                          Row(
+                          const Row(
                             children: [
-                              const Text(
+                              Text(
                                 "TOUR",
                                 style: TextStyle(
                                   fontSize: 24,
@@ -495,18 +522,15 @@ class _GroupMainPageState extends State<GroupMainPage> {
                                   color: Colors.indigo,
                                 ),
                               ),
-                              const SizedBox(
+                              SizedBox(
                                 width: 5,
-                              ),
-                              IconButton(
-                                onPressed: importPlan,
-                                icon: const Icon(Icons.note_add),
                               ),
                             ],
                           ),
                           const SizedBox(height: 10),
                           SizedBox(
                             height: 150,
+                            width: 336,
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -517,20 +541,119 @@ class _GroupMainPageState extends State<GroupMainPage> {
                                 const SizedBox(
                                   width: 5,
                                 ),
-                                // notice List 띄우는 부분
-                                const SingleChildScrollView(
-                                  child: Column(
-                                    children: [
-                                      Text(
-                                        "작성된 투어가 없습니다.\n새로운 투어를 가져와보세요!",
-                                        textAlign: TextAlign.justify,
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ],
+                                // plan List 띄우는 부분
+                                if (!planExist)
+                                  const Text(
+                                    "작성된 투어가 없습니다.\n그룹에서 새로운 투어를 가져와보세요!",
+                                    textAlign: TextAlign.justify,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
-                                ),
+                                if (planExist)
+                                  SizedBox(
+                                    width: 320,
+                                    child: ListView.separated(
+                                      scrollDirection: Axis.vertical,
+                                      itemCount: planList.length,
+                                      shrinkWrap: true,
+                                      itemBuilder: (context, index) {
+                                        var plan = planList[index];
+                                        return Container(
+                                          width: 300,
+                                          height: 62,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                            border: Border.all(
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                          child: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                horizontal: 16,
+                                              ),
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      const Column(
+                                                        children: [
+                                                          Text(
+                                                            "위치",
+                                                            style: TextStyle(
+                                                              fontSize: 18,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                            ),
+                                                          ),
+                                                          SizedBox(height: 4),
+                                                          Text(
+                                                            "시간",
+                                                            style: TextStyle(
+                                                              fontSize: 18,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                                horizontal: 6,
+                                                                vertical: 8),
+                                                        child: Container(
+                                                          width: 1,
+                                                          height: 42,
+                                                          color: Colors.black,
+                                                        ),
+                                                      ),
+                                                      const Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            "임시",
+                                                            style: TextStyle(
+                                                              fontSize: 18,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                            ),
+                                                          ),
+                                                          SizedBox(height: 4),
+                                                          Text(
+                                                            "임시",
+                                                            style: TextStyle(
+                                                              fontSize: 18,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              )),
+                                        );
+                                      },
+                                      separatorBuilder: (context, index) =>
+                                          const SizedBox(
+                                        height: 5,
+                                      ),
+                                    ),
+                                  ),
                               ],
                             ),
                           ),

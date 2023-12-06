@@ -219,16 +219,29 @@ class _NoticeEditPageState extends State<NoticeEditPage> {
                         ],
                       ),
                       ElevatedButton(
-                          onPressed: editNotice,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xfff5fbff),
+                        onPressed: editNotice,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xfff5fbff),
+                        ),
+                        child: const Text(
+                          "알림 수정",
+                          style: TextStyle(
+                            color: Colors.black,
                           ),
-                          child: const Text(
-                            "알림 수정",
-                            style: TextStyle(
-                              color: Colors.black,
-                            ),
-                          ))
+                        ),
+                      ),
+                      ElevatedButton(
+                        onPressed: editNotice,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xfff5fbff),
+                        ),
+                        child: const Text(
+                          "알림 수정",
+                          style: TextStyle(
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
