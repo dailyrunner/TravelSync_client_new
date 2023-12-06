@@ -134,8 +134,6 @@ class _NoticePageState extends State<NoticePage> {
                 )));
   }
 
-  void deleteNotice() {}
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -214,7 +212,7 @@ class _NoticePageState extends State<NoticePage> {
                                       });
                                     },
                                     child: Container(
-                                      width: 160,
+                                      width: 300,
                                       height: 62,
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(20),
@@ -290,9 +288,6 @@ class _NoticePageState extends State<NoticePage> {
                                                   ),
                                                 ],
                                               ),
-                                              if (notice.noticeLatitude != 0 &&
-                                                  notice.noticeLongitude != 0)
-                                                const Icon(Icons.location_on)
                                             ],
                                           )),
                                     ),
@@ -317,18 +312,6 @@ class _NoticePageState extends State<NoticePage> {
                               ),
                               child: const Text(
                                 "NOTICE 만들기",
-                                style: TextStyle(
-                                  color: Colors.black,
-                                ),
-                              ),
-                            ),
-                            ElevatedButton(
-                              onPressed: deleteNotice,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xfff5fbff),
-                              ),
-                              child: const Text(
-                                "NOTICE 삭제",
                                 style: TextStyle(
                                   color: Colors.black,
                                 ),

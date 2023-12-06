@@ -39,6 +39,7 @@ dependencies:
   background_fetch: ^1.1.6
   google_maps_flutter: ^2.1.7
   flutter_svg: ^1.1.0
+  flutter_local_notifications: ^16.2.0
 
 
   # The following adds the Cupertino Icons font to your application.

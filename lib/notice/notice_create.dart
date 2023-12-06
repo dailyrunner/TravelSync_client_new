@@ -2,8 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:travelsync_client_new/group/group_main_page.dart';
+import 'package:travelsync_client_new/notice/notice_page.dart';
 import 'package:travelsync_client_new/widgets/header.dart';
 import 'package:http/http.dart' as http;
 
@@ -24,6 +25,8 @@ class _NoticeCreatePageState extends State<NoticeCreatePage> {
   static const storage = FlutterSecureStorage();
   dynamic userKey = '';
   dynamic userInfo;
+  double latitude = 0, longitude = 0;
+  Set<Marker> marker = {};
 
   @override
   void initState() {
@@ -54,8 +57,8 @@ class _NoticeCreatePageState extends State<NoticeCreatePage> {
         'groupId': widget.groupId,
         'noticeDate': finalTime,
         'noticeTitle': noticeTitleController.text,
-        'noticeLatitude': 0.0,
-        'noticeLongitude': 0.0,
+        'noticeLatitude': latitude,
+        'noticeLongitude': longitude,
       };
       var body = json.encode(data);
       final response = await http.post(Uri.parse("$url/notice"),
@@ -84,7 +87,7 @@ class _NoticeCreatePageState extends State<NoticeCreatePage> {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  GroupMainPage(groupId: widget.groupId)));
+                                  NoticePage(groupId: widget.groupId)));
                     });
                   },
                 ),
@@ -137,6 +140,19 @@ class _NoticeCreatePageState extends State<NoticeCreatePage> {
     }
   }
 
+  getPoint(LatLng tappedPoint) {
+    setState(() {
+      marker = {
+        Marker(
+          markerId: const MarkerId('selected'),
+          position: tappedPoint,
+        )
+      };
+      latitude = tappedPoint.latitude;
+      longitude = tappedPoint.longitude;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -148,7 +164,7 @@ class _NoticeCreatePageState extends State<NoticeCreatePage> {
               children: [
                 const Header(textHeader: "Create NOTICE"),
                 const SizedBox(
-                  height: 40,
+                  height: 20,
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -163,8 +179,12 @@ class _NoticeCreatePageState extends State<NoticeCreatePage> {
                         ),
                       ),
                     ),
-                    Flexible(
-                      flex: 5,
+                    const SizedBox(
+                      width: 60,
+                    ),
+                    SizedBox(
+                      width: 120,
+                      height: 30,
                       child: TextField(
                         controller: noticeTitleController,
                         decoration: const InputDecoration(
@@ -172,15 +192,10 @@ class _NoticeCreatePageState extends State<NoticeCreatePage> {
                         ),
                       ),
                     ),
-                    Flexible(
-                        child: IconButton(
-                      icon: const Icon(Icons.search),
-                      onPressed: searchLocation,
-                    ))
                   ],
                 ),
                 const SizedBox(
-                  height: 20,
+                  height: 10,
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -194,6 +209,9 @@ class _NoticeCreatePageState extends State<NoticeCreatePage> {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
+                    ),
+                    const SizedBox(
+                      width: 70,
                     ),
                     Flexible(
                       flex: 5,
@@ -216,45 +234,51 @@ class _NoticeCreatePageState extends State<NoticeCreatePage> {
                         },
                       ),
                     ),
+                    const SizedBox(width: 20)
                   ],
-                ),
-                const SizedBox(
-                  height: 20,
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Flexible(
-                      flex: 3,
-                      child: Text(
-                        "시간",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
+                    const Text(
+                      "시간",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                    Flexible(
-                      flex: 5,
-                      child: TextButton(
-                        child: Text("$_setHour : $_setMinute"),
-                        onPressed: () async {
-                          Future<TimeOfDay?> selectedTime = showTimePicker(
-                            context: context,
-                            initialTime: TimeOfDay.now(),
-                          );
-                          selectedTime.then((timeOfDay) {
-                            setState(() {
-                              if (timeOfDay != null) {
-                                _setHour = timeOfDay.hour;
-                                _setMinute = timeOfDay.minute;
-                              }
-                            });
+                    const SizedBox(width: 85),
+                    TextButton(
+                      child: Text("$_setHour : $_setMinute"),
+                      onPressed: () async {
+                        Future<TimeOfDay?> selectedTime = showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay.now(),
+                        );
+                        selectedTime.then((timeOfDay) {
+                          setState(() {
+                            if (timeOfDay != null) {
+                              _setHour = timeOfDay.hour;
+                              _setMinute = timeOfDay.minute;
+                            }
                           });
-                        },
-                      ),
+                        });
+                      },
                     ),
+                    const SizedBox(width: 32),
                   ],
+                ),
+                SizedBox(
+                  height: 410,
+                  width: 320,
+                  child: GoogleMap(
+                      initialCameraPosition: const CameraPosition(
+                          target: LatLng(0, 0), zoom: 11.0),
+                      onTap: getPoint,
+                      markers: marker),
+                ),
+                const SizedBox(
+                  height: 10,
                 ),
                 ElevatedButton(
                     onPressed: createNotice,
