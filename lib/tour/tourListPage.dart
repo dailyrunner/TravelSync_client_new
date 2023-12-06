@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:travelsync_client_new/logo/airplaneLogo.dart';
@@ -31,26 +30,19 @@ class _TourListPageState extends State<TourListPage> {
   @override
   void initState() {
     super.initState();
-    // 비동기로 flutter secure storage 정보를 불러오는 작업
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _asyncMethod();
-      //getTourList();
     });
     tourList = [];
   }
 
   _asyncMethod() async {
-    // read 함수로 key값에 맞는 정보를 불러오고 데이터타입은 String 타입
-    // 데이터가 없을때는 null을 반환
     userInfo = await storage.read(key: 'login');
     url = (await storage.read(key: 'address'))!;
-    // userInfo = jsonDecode(userInfo);
-    // user의 정보가 있다면 로그인 후 들어가는 첫 페이지로 넘어가게 합니다.
     if (userInfo == null) {
       Navigator.pushNamed(context, '/');
     } else {
       userInfo = jsonDecode(userInfo);
-      // 여기서 getTourList() 호출하면 userInfo가 확실히 채워진 후에 호출됨
       getTourList();
       setState(() {});
     }
@@ -65,9 +57,8 @@ class _TourListPageState extends State<TourListPage> {
       String userId = userInfo["accountName"];
       final response =
           await http.get(Uri.parse("$url/tour/list/$userId"), headers: header);
-
       if (response.statusCode == 200) {
-        final tours = jsonDecode(response.body);
+        final tours = jsonDecode(utf8.decode(response.bodyBytes));
         tourList.clear();
         if (tours.isNotEmpty) {
           tourExist = true;
@@ -84,30 +75,12 @@ class _TourListPageState extends State<TourListPage> {
       }
     } catch (e) {
       print('Error is : $e');
-      //throw Error();
     }
   }
 
   Future<void> wait() async {
     await _asyncMethod();
   }
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   wait().then((_) {
-  //     setState(() {
-  //       getTourList();
-  //     });
-  //   });
-  // }
-
-  // void createTour() {
-  //   Navigator.push(
-  //       context, MaterialPageRoute(builder: (context) => CreateTour()));
-  // }
-
-  void deleteTour() {}
 
   void navigateToTourDatail(Tour selectedTour) {
     Navigator.push(
@@ -145,6 +118,7 @@ class _TourListPageState extends State<TourListPage> {
             const airplaneLogo(),
             const SizedBox(height: 40),
             const Header(textHeader: 'TOUR List'), //title
+            const SizedBox(height: 15),
             if (!tourExist)
               Column(
                 children: [
@@ -170,7 +144,7 @@ class _TourListPageState extends State<TourListPage> {
                             'assets/images/tour.png',
                             height: 100,
                           ),
-                          const SizedBox(height: 100),
+                          const SizedBox(height: 200),
                         ],
                       ),
                     ],
@@ -185,24 +159,53 @@ class _TourListPageState extends State<TourListPage> {
                   itemCount: tourList.length,
                   itemBuilder: (context, index) {
                     var tour = tourList[index];
-                    return Column(
-                      children: [
-                        Text('TOUR 이름: ${tour.tourName}'),
-                        Text('여행사: ${tour.tourCompany}'),
-                        // 다른 Tour 속성들 추가 가능
-                        const SizedBox(height: 10), // 각 Tour 정보 사이에 간격을 둠
-                      ],
+                    return GestureDetector(
+                      onTap: () {
+                        navigateToTourDatail(tour);
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                            top: 12, bottom: 8, left: 30, right: 30),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 348,
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color.fromARGB(255, 80, 80, 80)
+                                        .withOpacity(0.5),
+                                    blurRadius: 2.0,
+                                    spreadRadius: 1,
+                                    offset: const Offset(1, 1.5),
+                                  ),
+                                ],
+                              ),
+                              child: Text(
+                                '  TOUR 이름 : ${tour.tourName}\n          여행사 : ${tour.tourCompany}',
+                                style: const TextStyle(
+                                  fontFamily: 'Inter',
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     );
                   },
                 ),
               ),
-            //TOUR 만들기, TOUR 삭제 버튼
             Align(
               alignment: Alignment.bottomCenter,
               child: Padding(
-                padding: const EdgeInsets.only(bottom: 60.0), // 조절 가능한 여백 값
+                padding: const EdgeInsets.only(bottom: 60.0),
                 child: Row(
-                  //여기서부터 버튼 두 개
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     SizedBox(
@@ -228,38 +231,6 @@ class _TourListPageState extends State<TourListPage> {
                           ),
                           child: Text(
                             'TOUR 만들기',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 20),
-                    SizedBox(
-                      width: 160,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          navigatorKey.currentState
-                              ?.pushNamed('/main/tour/createTour');
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFF5FbFF),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          shadowColor: const Color.fromARGB(255, 80, 80, 80)
-                              .withOpacity(0.7),
-                        ),
-                        child: const Padding(
-                          padding: EdgeInsets.symmetric(
-                            vertical: 15,
-                            horizontal: 16,
-                          ),
-                          child: Text(
-                            'TOUR 삭제',
                             style: TextStyle(
                               color: Colors.black,
                               fontWeight: FontWeight.w600,
