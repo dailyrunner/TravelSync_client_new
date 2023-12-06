@@ -11,8 +11,8 @@ class airplaneLogo extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Container(
-          width: 150,
-          height: 50,
+          width: 170,
+          height: 65,
           decoration: const BoxDecoration(
             image: DecorationImage(
               image: AssetImage('assets/images/airplane_travelsync.png'),

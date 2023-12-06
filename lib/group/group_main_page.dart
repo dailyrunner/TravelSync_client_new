@@ -5,6 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:travelsync_client_new/group/group_setting_page.dart';
 import 'package:travelsync_client_new/group/notice_location_page.dart';
 import 'package:travelsync_client_new/location/people_check.dart';
+import 'package:travelsync_client_new/logo/airplaneLogo.dart';
 import 'package:travelsync_client_new/models/group.dart';
 import 'package:travelsync_client_new/models/notice.dart';
 import 'package:travelsync_client_new/models/plan.dart';
@@ -250,12 +251,12 @@ class _GroupMainPageState extends State<GroupMainPage> {
       home: Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
-          backgroundColor: Colors.transparent,
+          backgroundColor: Colors.white,
           elevation: 0,
           leading: IconButton(
             icon: const Icon(
               Icons.arrow_back,
-              size: 30,
+              size: 40,
             ),
             tooltip: '뒤로가기',
             color: Colors.black,
@@ -276,11 +277,11 @@ class _GroupMainPageState extends State<GroupMainPage> {
               icon: const Icon(Icons.settings_outlined),
               tooltip: 'settings',
               color: Colors.black,
-              iconSize: 40,
+              iconSize: 45,
             ),
           ],
         ),
-        backgroundColor: const Color(0xFFF5FBFF),
+        backgroundColor: Colors.white,
         body: FutureBuilder(
             future: wait(),
             builder: (context, snapshot) {
@@ -295,13 +296,11 @@ class _GroupMainPageState extends State<GroupMainPage> {
               }
               return SingleChildScrollView(
                 child: Padding(
-                  padding: const EdgeInsets.all(20.0),
+                  padding:
+                      const EdgeInsets.only(bottom: 20, left: 20, right: 20),
                   child: Column(
                     children: [
-                      const Header(
-                        // 나중에 지우기
-                        textHeader: "Group Main",
-                      ),
+                      const airplaneLogo(),
                       const SizedBox(
                         height: 20,
                       ),
@@ -312,12 +311,11 @@ class _GroupMainPageState extends State<GroupMainPage> {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      Text(
-                        groupdetail.groupName,
-                        style: const TextStyle(
-                          fontSize: 36,
-                          fontWeight: FontWeight.w600,
-                        ),
+                      Header(
+                          // 나중에 지우기
+                          textHeader: groupdetail.groupName),
+                      const SizedBox(
+                        height: 20,
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -375,7 +373,7 @@ class _GroupMainPageState extends State<GroupMainPage> {
                                 style: TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.w600,
-                                  color: Colors.indigo,
+                                  color: Color(0xff002357),
                                 ),
                               ),
                               const SizedBox(
@@ -563,7 +561,7 @@ class _GroupMainPageState extends State<GroupMainPage> {
                                 style: TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.w600,
-                                  color: Colors.indigo,
+                                  color: Color(0xff002357),
                                 ),
                               ),
                               SizedBox(
@@ -710,24 +708,57 @@ class _GroupMainPageState extends State<GroupMainPage> {
                             ElevatedButton(
                               onPressed: viewTravelerLocation,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xfff5fbff),
+                                backgroundColor: const Color(0xFFEFF5FF),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                shadowColor:
+                                    const Color.fromARGB(255, 80, 80, 80)
+                                        .withOpacity(0.7),
+                                elevation: 2.0,
                               ),
-                              child: const Text(
-                                "전체 위치 조회",
-                                style: TextStyle(
-                                  color: Colors.black,
+                              child: const Padding(
+                                padding: EdgeInsets.symmetric(
+                                  vertical: 15,
+                                  horizontal: 10,
+                                ),
+                                child: Text(
+                                  "전체 위치 조회",
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                  ),
                                 ),
                               ),
+                            ),
+                            const SizedBox(
+                              width: 20,
                             ),
                             ElevatedButton(
                               onPressed: checkTraveler,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xfff5fbff),
+                                backgroundColor: const Color(0xFFEFF5FF),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                shadowColor:
+                                    const Color.fromARGB(255, 80, 80, 80)
+                                        .withOpacity(0.7),
+                                elevation: 2.0,
                               ),
-                              child: const Text(
-                                "인원 점검",
-                                style: TextStyle(
-                                  color: Colors.black,
+                              child: const Padding(
+                                padding: EdgeInsets.symmetric(
+                                  vertical: 15,
+                                  horizontal: 26, //전체위치조회 button과 가로 길이 맞춤
+                                ),
+                                child: Text(
+                                  "인원 점검",
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                  ),
                                 ),
                               ),
                             ),
@@ -740,12 +771,27 @@ class _GroupMainPageState extends State<GroupMainPage> {
                             ElevatedButton(
                               onPressed: viewGuideLocation,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xfff5fbff),
+                                backgroundColor: const Color(0xFFEFF5FF),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                shadowColor:
+                                    const Color.fromARGB(255, 80, 80, 80)
+                                        .withOpacity(0.7),
+                                elevation: 2.0,
                               ),
-                              child: const Text(
-                                "가이드 위치 조회",
-                                style: TextStyle(
-                                  color: Colors.black,
+                              child: const Padding(
+                                padding: EdgeInsets.symmetric(
+                                  vertical: 15,
+                                  horizontal: 16,
+                                ),
+                                child: Text(
+                                  "가이드 위치 조회",
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                  ),
                                 ),
                               ),
                             ),

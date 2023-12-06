@@ -102,7 +102,7 @@ class _TourListPageState extends State<TourListPage> {
           leading: IconButton(
             icon: const Icon(
               Icons.arrow_back,
-              size: 30,
+              size: 40,
             ),
             tooltip: '뒤로가기',
             color: Colors.black,
@@ -116,7 +116,7 @@ class _TourListPageState extends State<TourListPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const airplaneLogo(),
-            const SizedBox(height: 40),
+            const SizedBox(height: 20),
             const Header(textHeader: 'TOUR List'), //title
             const SizedBox(height: 15),
             if (!tourExist)
@@ -153,7 +153,7 @@ class _TourListPageState extends State<TourListPage> {
               ),
             if (tourExist)
               SizedBox(
-                height: 500,
+                height: 480,
                 child: ListView.builder(
                   scrollDirection: Axis.vertical,
                   itemCount: tourList.length,

@@ -18,8 +18,9 @@ class Header extends StatelessWidget {
           children: [
             Container(
               alignment: Alignment.center,
-              padding: const EdgeInsets.only(
-                bottom: 5,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 5,
               ),
               decoration: const BoxDecoration(
                 border: Border(
@@ -29,7 +30,6 @@ class Header extends StatelessWidget {
                   ),
                 ),
               ),
-              width: 220.0,
               child: Text(
                 textHeader,
                 style: const TextStyle(

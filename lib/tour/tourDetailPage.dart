@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:travelsync_client_new/logo/airplaneLogo.dart';
 import 'package:travelsync_client_new/models/plan.dart';
 import 'package:travelsync_client_new/models/tour.dart';
-import 'package:travelsync_client_new/plan/planDay.dart';
 import 'package:travelsync_client_new/widget/globals.dart';
 import 'package:travelsync_client_new/widgets/header.dart';
 
@@ -130,7 +129,7 @@ class _TourDetailPageState extends State<TourDetailPage> {
           leading: IconButton(
             icon: const Icon(
               Icons.arrow_back,
-              size: 30,
+              size: 40,
             ),
             tooltip: '뒤로가기',
             color: Colors.black,
