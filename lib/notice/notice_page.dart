@@ -262,6 +262,7 @@ class _NoticePageState extends State<NoticePage> {
                                                           fontSize: 18,
                                                           fontWeight:
                                                               FontWeight.w600,
+                                                          color: Colors.black,
                                                         ),
                                                       ),
                                                       SizedBox(height: 4),
@@ -271,6 +272,7 @@ class _NoticePageState extends State<NoticePage> {
                                                           fontSize: 18,
                                                           fontWeight:
                                                               FontWeight.w600,
+                                                          color: Colors.black,
                                                         ),
                                                       ),
                                                     ],
@@ -297,6 +299,7 @@ class _NoticePageState extends State<NoticePage> {
                                                           fontSize: 18,
                                                           fontWeight:
                                                               FontWeight.w600,
+                                                          color: Colors.black,
                                                         ),
                                                       ),
                                                       const SizedBox(height: 4),
@@ -306,6 +309,7 @@ class _NoticePageState extends State<NoticePage> {
                                                           fontSize: 18,
                                                           fontWeight:
                                                               FontWeight.w600,
+                                                          color: Colors.black,
                                                         ),
                                                       ),
                                                     ],

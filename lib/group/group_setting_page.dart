@@ -165,7 +165,7 @@ class _GroupSettingPageState extends State<GroupSettingPage> {
                 TextButton(
                   child: const Text("닫기"),
                   onPressed: () async {
-                    await storage.delete(key: 'login');
+                    await storage.delete(key: 'groupId');
                     Navigator.pop(context);
                     navigatorKey.currentState?.pushNamed('/main');
                   },
@@ -267,7 +267,7 @@ class _GroupSettingPageState extends State<GroupSettingPage> {
                 TextButton(
                   child: const Text("닫기"),
                   onPressed: () async {
-                    await storage.delete(key: 'login');
+                    await storage.delete(key: 'groupId');
                     Navigator.pop(context);
                     Future.microtask(() => Navigator.push(
                         context,
