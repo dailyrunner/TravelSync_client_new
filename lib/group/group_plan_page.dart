@@ -10,6 +10,7 @@ import 'package:travelsync_client_new/tour/EditTourPlanPage.dart';
 import 'package:travelsync_client_new/tour/createTour.dart';
 import 'package:travelsync_client_new/tour/tourListPage.dart';
 import 'package:travelsync_client_new/widget/globals.dart';
+import 'package:travelsync_client_new/widget/home_page.dart';
 import 'package:travelsync_client_new/widgets/header.dart';
 
 class GroupPlanPage extends StatefulWidget {
@@ -278,7 +279,12 @@ class _GroupPlanPageState extends State<GroupPlanPage> {
             tooltip: '뒤로가기',
             color: Colors.black,
             onPressed: () {
-              navigatorKey.currentState?.pushNamed('/main');
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const HomePage(),
+                ),
+              );
             },
           ),
           // actions: [

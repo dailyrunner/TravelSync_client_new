@@ -1,18 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart'; // DIO 패키지로 HTTP 통신
 import 'dart:convert'; // JSON Encode, Decode를 위한 패키지
-import 'package:flutter_secure_storage/flutter_secure_storage.dart'; // flutter_secure_storage 패키지
-import 'package:travelsync_client_new/group/group_create_page.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'package:travelsync_client_new/models/model.dart';
-import 'package:travelsync_client_new/tour/tourListPage.dart';
-import 'package:travelsync_client_new/tour/createTour.dart';
 import 'package:travelsync_client_new/widget/globals.dart';
 import 'package:travelsync_client_new/widget/home_page.dart';
-import 'package:travelsync_client_new/widget/info_change.dart';
 import 'package:travelsync_client_new/widget/join.dart';
 import 'package:travelsync_client_new/widget/login_widget_group.dart';
-import 'package:travelsync_client_new/widget/settings_page.dart';
 
 class StartingPage extends StatelessWidget {
   const StartingPage({super.key});
@@ -20,17 +15,8 @@ class StartingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      navigatorKey: navigatorKey,
       initialRoute: '/', // 앱이 시작될 때 보여질 화면
-      routes: {
-        '/join': (context) => const JoinPage(),
-        '/main': (context) => const HomePage(),
-        '/main/tour': (context) => const TourListPage(),
-        '/main/tour/createTour': (context) => CreateTour(),
-        '/main/group': (context) => const GroupCreatePage(),
-        '/main/settings': (context) => const SettingsPage(),
-        '/main/settings/infoChange': (context) => const InfoChange(),
-      },
+      navigatorKey: navigatorKey,
       home: const LoginPage(),
     );
   }
@@ -71,7 +57,12 @@ class _LoginPageState extends State<LoginPage> {
 
     // user의 정보가 있다면 로그인 후 들어가는 첫 페이지로 넘어가게 합니다.
     if (userInfo != null) {
-      navigatorKey.currentState?.pushNamed('/main');
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const HomePage(),
+        ),
+      );
     }
   }
 
@@ -200,8 +191,12 @@ class _LoginPageState extends State<LoginPage> {
                   onTap: () async {
                     if (await loginAction(username.text, password.text) ==
                         true) {
-                      navigatorKey.currentState
-                          ?.pushNamed('/main'); // 로그인 이후 서비스 화면으로 이동
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const HomePage(),
+                        ),
+                      ); // 로그인 이후 서비스 화면으로 이동
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
@@ -261,8 +256,12 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     child: InkWell(
                       onTap: () {
-                        navigatorKey.currentState
-                            ?.pushNamed('/join'); // 회원가입페이지로 이동
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const JoinPage(),
+                          ),
+                        ); // 회원가입페이지로 이동
                       },
                       child: Container(
                         padding: const EdgeInsets.all(8.0),

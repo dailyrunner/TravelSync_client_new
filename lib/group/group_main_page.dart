@@ -15,6 +15,7 @@ import 'package:travelsync_client_new/notice/notice_page.dart';
 import 'package:travelsync_client_new/location/all_location.dart';
 import 'package:travelsync_client_new/widget/globals.dart';
 import 'package:travelsync_client_new/location/guide_location.dart';
+import 'package:travelsync_client_new/widget/home_page.dart';
 import 'package:travelsync_client_new/widgets/header.dart';
 import 'package:http/http.dart' as http;
 
@@ -338,7 +339,12 @@ class _GroupMainPageState extends State<GroupMainPage> {
             color: Colors.black,
             onPressed: () async {
               await storage.delete(key: 'groupId');
-              navigatorKey.currentState?.pushNamed('/main');
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const HomePage(),
+                ),
+              );
             },
           ),
           actions: [

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:travelsync_client_new/logo/airplaneLogo.dart';
 import 'package:travelsync_client_new/models/plan.dart';
+import 'package:travelsync_client_new/tour/tourListPage.dart';
 import 'package:travelsync_client_new/widget/globals.dart';
 import '../widgets/header.dart';
 
@@ -281,7 +282,12 @@ class CreateTourState extends State<CreateTour> {
             tooltip: '뒤로가기',
             color: Colors.black,
             onPressed: () {
-              navigatorKey.currentState?.pop();
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const TourListPage(),
+                ),
+              );
             },
           ),
         ),
@@ -568,7 +574,12 @@ class CreateTourState extends State<CreateTour> {
                   child: ElevatedButton(
                     onPressed: () {
                       createplan();
-                      navigatorKey.currentState?.pushNamed('/main/tour');
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const TourListPage(),
+                        ),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFEFF5FF),

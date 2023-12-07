@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:travelsync_client_new/group/group_main_page.dart';
 import 'package:travelsync_client_new/models/group.dart';
 import 'package:travelsync_client_new/widget/globals.dart';
+import 'package:travelsync_client_new/widget/home_page.dart';
 import 'package:travelsync_client_new/widgets/header.dart';
 import 'package:http/http.dart' as http;
 
@@ -115,7 +116,12 @@ class _GroupInvitePageState extends State<GroupInvitePage> {
   }
 
   void declineJoinGroup() {
-    navigatorKey.currentState?.pushNamed('/main');
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const HomePage(),
+      ),
+    );
   }
 
   checkUserState() async {
