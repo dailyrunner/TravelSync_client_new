@@ -4,6 +4,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:travelsync_client_new/logo/airplaneLogo.dart';
 import 'package:travelsync_client_new/models/userinfo.dart';
 import 'package:travelsync_client_new/widget/globals.dart';
+import 'package:travelsync_client_new/widget/login_page.dart';
+import 'package:travelsync_client_new/widget/settings_page.dart';
 import 'package:travelsync_client_new/widget/validate.dart';
 import 'package:travelsync_client_new/widgets/header.dart'; // flutter_secure_storage 패키지
 import 'package:http/http.dart' as http;
@@ -52,7 +54,12 @@ class _InfoChangeState extends State<InfoChange> {
 
     // user의 정보가 없다면 로그인 페이지로 넘어가게 합니다.
     if (userKey == null) {
-      navigatorKey.currentState?.pushNamed('/');
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const LoginPage(),
+        ),
+      );
     } else {
       userInfo = jsonDecode(userKey);
       await getUserInfo();
@@ -84,7 +91,7 @@ class _InfoChangeState extends State<InfoChange> {
                     TextButton(
                       child: const Text("닫기"),
                       onPressed: () {
-                        navigatorKey.currentState?.pop();
+                        Navigator.pop(context);
                       },
                     ),
                   ],
@@ -104,7 +111,7 @@ class _InfoChangeState extends State<InfoChange> {
                   TextButton(
                     child: const Text("닫기"),
                     onPressed: () {
-                      navigatorKey.currentState?.pop();
+                      Navigator.pop(context);
                     },
                   ),
                 ],
@@ -168,7 +175,12 @@ class _InfoChangeState extends State<InfoChange> {
 
   logout() async {
     await storage.delete(key: 'login');
-    navigatorKey.currentState?.pushNamed('/');
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const LoginPage(),
+      ),
+    );
   }
 
   InputDecoration _textFormDecoration(hintText, helperText) {
@@ -195,7 +207,12 @@ class _InfoChangeState extends State<InfoChange> {
             tooltip: '뒤로가기',
             color: Colors.black,
             onPressed: () {
-              navigatorKey.currentState?.pop();
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const SettingsPage(),
+                ),
+              );
             },
           ),
         ),
@@ -413,7 +430,12 @@ class _InfoChangeState extends State<InfoChange> {
                                   Duration(seconds: 1), // SnackBar가 표시되는 시간 설정
                             ),
                           );
-                          navigatorKey.currentState?.pop();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const SettingsPage(),
+                            ),
+                          );
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(

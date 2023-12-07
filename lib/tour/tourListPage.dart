@@ -8,6 +8,7 @@ import 'package:travelsync_client_new/models/tour.dart';
 import 'package:travelsync_client_new/tour/createTour.dart';
 import 'package:travelsync_client_new/tour/tourDetailPage.dart';
 import 'package:travelsync_client_new/widget/globals.dart';
+import 'package:travelsync_client_new/widget/home_page.dart';
 import '../../widgets/header.dart';
 
 class TourListPage extends StatefulWidget {
@@ -107,7 +108,12 @@ class _TourListPageState extends State<TourListPage> {
             tooltip: '뒤로가기',
             color: Colors.black,
             onPressed: () {
-              navigatorKey.currentState?.pushNamed('/main');
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const HomePage(),
+                ),
+              );
             },
           ),
         ),
@@ -212,8 +218,12 @@ class _TourListPageState extends State<TourListPage> {
                       width: 160,
                       child: ElevatedButton(
                         onPressed: () {
-                          navigatorKey.currentState
-                              ?.pushNamed('/main/tour/createTour');
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => CreateTour(),
+                            ),
+                          );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFFEFF5FF),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:travelsync_client_new/widget/login_page.dart';
 import 'package:travelsync_client_new/widget/validate.dart';
 import 'globals.dart';
 
@@ -164,7 +165,12 @@ class _JoinPageState extends State<JoinPage> {
             ),
             onPressed: () {
               // 뒤로가기 버튼을 눌렀을 때 수행할 동작
-              navigatorKey.currentState?.pop();
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const LoginPage(),
+                ),
+              );
             },
           ),
         ),
@@ -456,7 +462,12 @@ class _JoinPageState extends State<JoinPage> {
                       if (await submitJoin(userName.text, userId.text,
                               password.text, phoneNum.text) ==
                           true) {
-                        navigatorKey.currentState?.pushNamed('/');
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const LoginPage(),
+                          ),
+                        );
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(

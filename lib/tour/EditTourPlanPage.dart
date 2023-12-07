@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:travelsync_client_new/logo/airplaneLogo.dart';
 import 'package:travelsync_client_new/models/plan.dart';
+import 'package:travelsync_client_new/tour/tourListPage.dart';
 import 'package:travelsync_client_new/widget/globals.dart';
 import 'package:travelsync_client_new/widgets/header.dart';
 
@@ -106,7 +107,12 @@ class _EditTourPlanPageState extends State<EditTourPlanPage> {
                   child: const Text("닫기"),
                   onPressed: () {
                     Navigator.pop(context);
-                    navigatorKey.currentState?.pushNamed('/main/tour');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const TourListPage(),
+                      ),
+                    );
                   },
                 ),
               ],
@@ -173,7 +179,12 @@ class _EditTourPlanPageState extends State<EditTourPlanPage> {
             tooltip: '뒤로가기',
             color: Colors.black,
             onPressed: () {
-              navigatorKey.currentState?.pushNamed('/main/tour');
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const TourListPage(),
+                ),
+              );
             },
           ),
         ),

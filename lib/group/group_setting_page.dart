@@ -167,7 +167,12 @@ class _GroupSettingPageState extends State<GroupSettingPage> {
                   onPressed: () async {
                     await storage.delete(key: 'groupId');
                     Navigator.pop(context);
-                    navigatorKey.currentState?.pushNamed('/main');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const HomePage(),
+                      ),
+                    );
                   },
                 ),
               ],

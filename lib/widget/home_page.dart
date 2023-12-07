@@ -5,8 +5,10 @@ import 'package:travelsync_client_new/group/group_create_page.dart';
 import 'package:travelsync_client_new/group/group_main_page.dart';
 import 'package:travelsync_client_new/logo/airplaneLogo.dart';
 import 'package:travelsync_client_new/models/group.dart';
+import 'package:travelsync_client_new/tour/tourListPage.dart';
 import 'package:travelsync_client_new/widget/globals.dart';
 import 'package:http/http.dart' as http;
+import 'package:travelsync_client_new/widget/settings_page.dart';
 import 'package:travelsync_client_new/widgets/header.dart';
 
 class HomePage extends StatefulWidget {
@@ -78,7 +80,12 @@ class _HomePageState extends State<HomePage> {
           actions: [
             IconButton(
               onPressed: () {
-                navigatorKey.currentState?.pushNamed('/main/settings');
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SettingsPage(),
+                  ),
+                );
               },
               icon: const Icon(Icons.settings_outlined),
               tooltip: 'settings',
@@ -277,8 +284,12 @@ class _HomePageState extends State<HomePage> {
             //투어 생성하기 버튼
             ElevatedButton(
               onPressed: () {
-                // 버튼이 눌리면 다른 페이지로 이동
-                navigatorKey.currentState?.pushNamed('/main/tour');
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const TourListPage(),
+                  ),
+                );
               },
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(280, 45),
@@ -288,7 +299,7 @@ class _HomePageState extends State<HomePage> {
                 elevation: 2.0,
               ),
               child: const Text(
-                '투어 생성하기',
+                '여행계획 관리',
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w800,
@@ -303,7 +314,12 @@ class _HomePageState extends State<HomePage> {
             ElevatedButton(
               onPressed: () {
                 // 버튼이 눌리면 다른 페이지로 이동
-                navigatorKey.currentState?.pushNamed('/main/group');
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const GroupCreatePage(),
+                  ),
+                );
               },
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(280, 45),

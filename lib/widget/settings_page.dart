@@ -5,6 +5,9 @@ import 'package:travelsync_client_new/group/group_invite_page.dart';
 import 'package:travelsync_client_new/logo/airplaneLogo.dart';
 import 'package:travelsync_client_new/models/userinfo.dart';
 import 'package:travelsync_client_new/widget/globals.dart';
+import 'package:travelsync_client_new/widget/home_page.dart';
+import 'package:travelsync_client_new/widget/info_change.dart';
+import 'package:travelsync_client_new/widget/login_page.dart';
 import 'package:travelsync_client_new/widgets/header.dart'; // flutter_secure_storage 패키지
 import 'package:http/http.dart' as http;
 
@@ -42,7 +45,12 @@ class _SettingsPageState extends State<SettingsPage> {
 
     // user의 정보가 없다면 로그인 페이지로 넘어가게 합니다.
     if (userKey == null) {
-      navigatorKey.currentState?.pushNamed('/');
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const LoginPage(),
+        ),
+      );
     } else {
       userInfo = jsonDecode(userKey);
       await getUserInfo();
@@ -74,7 +82,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     TextButton(
                       child: const Text("닫기"),
                       onPressed: () {
-                        navigatorKey.currentState?.pop();
+                        Navigator.pop(context);
                       },
                     ),
                   ],
@@ -94,7 +102,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   TextButton(
                     child: const Text("닫기"),
                     onPressed: () {
-                      navigatorKey.currentState?.pop();
+                      Navigator.pop(context);
                     },
                   ),
                 ],
@@ -106,7 +114,12 @@ class _SettingsPageState extends State<SettingsPage> {
 
   logout() async {
     await storage.delete(key: 'login');
-    navigatorKey.currentState?.pushNamed('/');
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const LoginPage(),
+      ),
+    );
   }
 
   checkInviteCode() async {
@@ -180,7 +193,12 @@ class _SettingsPageState extends State<SettingsPage> {
             tooltip: '뒤로가기',
             color: Colors.black,
             onPressed: () {
-              navigatorKey.currentState?.pop();
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const HomePage(),
+                ),
+              );
             },
           ),
         ),
@@ -353,8 +371,12 @@ class _SettingsPageState extends State<SettingsPage> {
                           ),
                           InkWell(
                             onTap: () {
-                              navigatorKey.currentState
-                                  ?.pushNamed('/main/settings/infoChange');
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const InfoChange(),
+                                ),
+                              );
                             },
                             child: Container(
                               width: 20,
