@@ -175,7 +175,7 @@ class _SettingsPageState extends State<SettingsPage> {
           leading: IconButton(
             icon: const Icon(
               Icons.arrow_back,
-              size: 30,
+              size: 40,
             ),
             tooltip: '뒤로가기',
             color: Colors.black,
@@ -544,7 +544,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     style: TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.w600,
-                      fontSize: 16,
+                      fontSize: 18,
                     ),
                   ),
                 ),

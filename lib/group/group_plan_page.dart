@@ -415,12 +415,16 @@ class _GroupPlanPageState extends State<GroupPlanPage> {
                                       ),
                                     ),
                                     const SizedBox(width: 30),
-                                    Text(
-                                      plan.planTitle,
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontFamily: 'Inter',
-                                        fontWeight: FontWeight.w600,
+                                    Expanded(
+                                      child: Text(
+                                        plan.planTitle,
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontFamily: 'Inter',
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 4,
                                       ),
                                     ),
                                   ],
@@ -437,12 +441,16 @@ class _GroupPlanPageState extends State<GroupPlanPage> {
                                       ),
                                     ),
                                     const SizedBox(width: 13),
-                                    Text(
-                                      plan.planContent,
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontFamily: 'Inter',
-                                        fontWeight: FontWeight.w400,
+                                    Expanded(
+                                      child: Text(
+                                        plan.planContent,
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontFamily: 'Inter',
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 4,
                                       ),
                                     ),
                                   ],
