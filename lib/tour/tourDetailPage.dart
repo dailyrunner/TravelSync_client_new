@@ -86,6 +86,7 @@ class _TourDetailPageState extends State<TourDetailPage> {
               ? planList.map((plan) => plan.day).toSet().length
               : 1;
         });
+        sortPlans(planList);
       } else {
         print('Failed to load plans. ${response.statusCode}');
       }
@@ -97,8 +98,6 @@ class _TourDetailPageState extends State<TourDetailPage> {
   Future<void> getTourInfo(int tourId) async {
     try {
       if (userInfo == null || userInfo["accessToken"] == null) {
-        // userInfo가 null이거나 "accessToken" 키에 대한 값이 null인 경우
-        // 에러를 방지하기 위해 처리
         print("accessToken is null");
         throw Exception("accessToken is null");
       }
@@ -138,6 +137,7 @@ class _TourDetailPageState extends State<TourDetailPage> {
         this.selectedDay = selectedDay;
         planList = selectedDayPlans;
       });
+      sortPlans(planList);
     } catch (error) {
       print('Error while fetching selected day plans: $error');
     }
@@ -248,6 +248,27 @@ class _TourDetailPageState extends State<TourDetailPage> {
     }
   }
 
+  /////////////////////////////
+  void editPlansForSelectedDay(int selectedDay) {
+    List<Plan> selectedDayPlans =
+        planList.where((plan) => plan.day == selectedDay).toList();
+
+    // 선택된 일자의 모든 계획을 수정 페이지로 이동
+    for (Plan plan in selectedDayPlans) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => EditTourPlanPage(
+            tourId: widget.selectedTour.tourId,
+            planId: plan.planId, // 선택된 계획의 ID 전달
+            day: plan.day,
+          ),
+        ),
+      );
+    }
+  }
+  ///////////////////////////
+
   void sortPlans(List<Plan> plans) {
     //day, time을 기준으로 오름차순 정렬
     plans.sort((a, b) {
@@ -281,20 +302,20 @@ class _TourDetailPageState extends State<TourDetailPage> {
               navigatorKey.currentState?.pushNamed('/main');
             },
           ),
-          // actions: [
-          //   IconButton(
-          //     icon: const Icon(
-          //       Icons.delete_outline_outlined,
-          //       size: 45,
-          //     ),
-          //     tooltip: '삭제',
-          //     color: const Color(0xff002357),
-          //     onPressed: () {
-          //       // Call a function to delete the current tour
-          //       deleteTourAndPlans(widget.selectedTour.tourId);
-          //     },
-          //   ),
-          // ],
+          actions: [
+            IconButton(
+              icon: const Icon(
+                Icons.delete_outline_outlined,
+                size: 45,
+              ),
+              tooltip: '삭제',
+              color: const Color(0xff002357),
+              onPressed: () {
+                // Call a function to delete the current tour
+                deleteTourAndPlans(widget.selectedTour.tourId);
+              },
+            ),
+          ],
         ),
         backgroundColor: Colors.white,
         body: Column(
@@ -323,9 +344,11 @@ class _TourDetailPageState extends State<TourDetailPage> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    //day 출력
                     const SizedBox(
-                      width: 384,
+                      height: 5,
+                    ),
+                    const SizedBox(
+                      width: 386,
                       child: Divider(
                         thickness: 2.0,
                         color: Color.fromARGB(255, 187, 214, 255),
@@ -338,24 +361,18 @@ class _TourDetailPageState extends State<TourDetailPage> {
                           planDay,
                           (index) => GestureDetector(
                             onTap: () {
-                              // setState(() {
-                              //   selectedDay = index + 1;
-                              // });
                               getSelectedDayPlan(index + 1);
                             },
                             child: Container(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 16),
-                              // color: index + 1 == selectedDay
-                              //     ? Colors.blue.withOpacity(0.5)
-                              //     : Colors.transparent,
                               child: Text(
-                                'Day ${index + 1}',
+                                '  Day ${index + 1}',
                                 style: TextStyle(
                                   fontSize: 20,
                                   fontFamily: 'Inter',
                                   color: index + 1 == selectedDay
-                                      ? Colors.blue[700] // 선택된 일자는 흰색으로 변경
+                                      ? Colors.blue[700]
                                       : Colors.black,
                                 ),
                               ),
@@ -365,7 +382,7 @@ class _TourDetailPageState extends State<TourDetailPage> {
                       ),
                     ),
                     const SizedBox(
-                      width: 384,
+                      width: 386,
                       child: Divider(
                         thickness: 2.0,
                         color: Color.fromARGB(255, 187, 214, 255),
@@ -374,17 +391,50 @@ class _TourDetailPageState extends State<TourDetailPage> {
                     const SizedBox(height: 20),
                     SizedBox(
                       width: 364,
-                      height: 40,
-                      child: Text("$selectedDay일차",
-                          style: const TextStyle(
+                      height: 30,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(
+                            "$selectedDay일차",
+                            style: const TextStyle(
                               fontSize: 20,
                               fontFamily: 'Inter',
-                              fontWeight: FontWeight.w600)),
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          // 수정 버튼 추가
+                          // TextButton(
+                          //   onPressed: () {
+                          //     // 선택된 일자의 모든 계획을 수정 페이지로 이동
+                          //     editPlansForSelectedDay(selectedDay);
+                          //   },
+                          //
+                          //     const Row(
+                          //       children: [
+                          //         Icon(
+                          //           Icons.edit,
+                          //           size: 20,
+                          //           color: Colors.black,
+                          //         ),
+                          //         Text(
+                          //           "수정하기",
+                          //           style: TextStyle(
+                          //             fontSize: 12,
+                          //             fontFamily: 'Inter',
+                          //             fontWeight: FontWeight.w600,
+                          //             color: Colors.black,
+                          //           ),
+                          //         ),
+                          //       ],
+                          //     ),
+                          // ),
+                        ],
+                      ),
                     ),
                     const SizedBox(
-                      height: 15,
+                      height: 10,
                     ),
-
                     for (Plan plan in planList)
                       if (plan.day == selectedDay)
                         Padding(
@@ -410,7 +460,7 @@ class _TourDetailPageState extends State<TourDetailPage> {
                                       style: const TextStyle(
                                         fontSize: 16,
                                         color: Colors.grey,
-                                        fontFamily: 'YourDesiredFont',
+                                        fontFamily: 'Inter',
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
@@ -422,6 +472,28 @@ class _TourDetailPageState extends State<TourDetailPage> {
                                         fontFamily: 'Inter',
                                         fontWeight: FontWeight.w600,
                                       ),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(
+                                        Icons.edit,
+                                        size: 20,
+                                      ),
+                                      onPressed: () {
+                                        // 플랜 수정 페이지로 이동
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                EditTourPlanPage(
+                                              tourId:
+                                                  widget.selectedTour.tourId,
+                                              planId:
+                                                  plan.planId, // 선택된 계획의 ID 전달
+                                              day: plan.day,
+                                            ),
+                                          ),
+                                        );
+                                      },
                                     ),
                                   ],
                                 ),
