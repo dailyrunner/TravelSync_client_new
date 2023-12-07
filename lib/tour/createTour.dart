@@ -37,7 +37,6 @@ class CreateTourState extends State<CreateTour> {
   static const storage =
       FlutterSecureStorage(); // FlutterSecureStorage를 storage로 저장
   dynamic userInfo = ''; // storage에 있는 유저 정보를 저장
-  //flutter_secure_storage 사용을 위한 초기화 작업
   @override
   void initState() {
     super.initState();
@@ -48,12 +47,9 @@ class CreateTourState extends State<CreateTour> {
   }
 
   _asyncMethod() async {
-    // read 함수로 key값에 맞는 정보를 불러오고 데이터타입은 String 타입
-    // 데이터가 없을때는 null을 반환
     userInfo = await storage.read(key: 'login');
     url = (await storage.read(key: 'address'))!;
     userInfo = jsonDecode(userInfo);
-    // user의 정보가 있다면 로그인 후 들어가는 첫 페이지로 넘어가게 합니다.
     if (userInfo == null) {
       Navigator.pushNamed(context, '/');
     }
@@ -84,7 +80,6 @@ class CreateTourState extends State<CreateTour> {
       showDialog(
         context: context,
         builder: (BuildContext context) {
-          // return object of type Dialog
           return AlertDialog(
             content: const Text("여행사를 입력해주세요."),
             actions: <Widget>[
@@ -113,7 +108,6 @@ class CreateTourState extends State<CreateTour> {
           },
           body: body);
 
-      // 요청이 성공했는지 확인 (상태 코드 200)
       if (response.statusCode == 200) {
         if (!mounted) return;
         dynamic responseBody = jsonDecode(response.body);
@@ -138,9 +132,6 @@ class CreateTourState extends State<CreateTour> {
           print(tourId);
         });
         print('성공 tourId: $tourId');
-
-        // 응답 바디에서 TourID 추출
-        // TourID와 무언가를 수행, 예를 들면 출력하거나 저장하기
       } else {
         // 요청이 실패한 경우 에러 처리
         print('여행 생성 실패. 상태 코드: ${response.statusCode}');
