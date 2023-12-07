@@ -132,6 +132,40 @@ class _PeopleCheckState extends State<PeopleCheck> {
               width: 360.0,
             ),
             Container(
+              height: 10,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Container(
+                  width: 40,
+                ),
+                Text(
+                  '없는 인원 위치 조회 - $notNear명',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Container(
+                  width: 40,
+                ),
+                const Text(
+                  '위치조회를 누르면 여행객의 위치를 보여줍니다.',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF003157),
+                  ),
+                ),
+              ],
+            ),
+            Container(
               height: 30,
             ),
             SizedBox(
@@ -175,7 +209,7 @@ class _PeopleCheckState extends State<PeopleCheck> {
                             Row(
                               children: [
                                 Container(
-                                  width: 20,
+                                  width: 70,
                                 ),
                                 Text(
                                   "${location.userName} 여행객",
@@ -186,7 +220,7 @@ class _PeopleCheckState extends State<PeopleCheck> {
                                   ),
                                 ),
                                 Container(
-                                  width: 20,
+                                  width: 100,
                                 ),
                                 ElevatedButton(
                                   onPressed: () {
@@ -296,7 +330,7 @@ class _PeopleCheckState extends State<PeopleCheck> {
           headers: header);
       if (response.statusCode == 200) {
         var responseBody = jsonDecode(utf8.decode(response.bodyBytes));
-        peopleNearby = responseBody.toString();
+        peopleNearby = (responseBody - 1).toString();
         print(peopleNearby);
         setState(() {});
       } else {
