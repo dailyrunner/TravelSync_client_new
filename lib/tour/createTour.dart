@@ -241,7 +241,7 @@ class CreateTourState extends State<CreateTour> {
             builder: (BuildContext context) {
               // return object of type Dialog
               return AlertDialog(
-                content: const Text("일정이 추가되었습니다."),
+                content: const Text("투어가 생성되었습니다."),
                 actions: <Widget>[
                   TextButton(
                     child: const Text("닫기"),
@@ -595,7 +595,7 @@ class CreateTourState extends State<CreateTour> {
                         horizontal: 16,
                       ),
                       child: Text(
-                        '일정 추가',
+                        '작성 완료',
                         style: TextStyle(
                           color: Color.fromARGB(255, 80, 80, 80),
                           fontWeight: FontWeight.w600,
