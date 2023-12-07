@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:travelsync_client_new/logo/airplaneLogo.dart';
 import 'package:travelsync_client_new/models/plan.dart';
 import 'package:travelsync_client_new/models/tour.dart';
+import 'package:travelsync_client_new/tour/EditTourPlanPage.dart';
 import 'package:travelsync_client_new/tour/createTour.dart';
 import 'package:travelsync_client_new/tour/tourListPage.dart';
 import 'package:travelsync_client_new/widget/globals.dart';
@@ -277,23 +278,23 @@ class _TourDetailPageState extends State<TourDetailPage> {
             tooltip: '뒤로가기',
             color: Colors.black,
             onPressed: () {
-              navigatorKey.currentState?.pop();
+              navigatorKey.currentState?.pushNamed('/main');
             },
           ),
-          actions: [
-            IconButton(
-              icon: const Icon(
-                Icons.delete_outline_outlined,
-                size: 45,
-              ),
-              tooltip: '삭제',
-              color: const Color(0xff002357),
-              onPressed: () {
-                // Call a function to delete the current tour
-                deleteTourAndPlans(widget.selectedTour.tourId);
-              },
-            ),
-          ],
+          // actions: [
+          //   IconButton(
+          //     icon: const Icon(
+          //       Icons.delete_outline_outlined,
+          //       size: 45,
+          //     ),
+          //     tooltip: '삭제',
+          //     color: const Color(0xff002357),
+          //     onPressed: () {
+          //       // Call a function to delete the current tour
+          //       deleteTourAndPlans(widget.selectedTour.tourId);
+          //     },
+          //   ),
+          // ],
         ),
         backgroundColor: Colors.white,
         body: Column(
