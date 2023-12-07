@@ -478,7 +478,7 @@ class _GroupMainPageState extends State<GroupMainPage> {
                                 ),
                                 if (!noticeExist)
                                   const Text(
-                                    "작성된 공지가 없습니다.\n새로운 공지를 등록해주세요!",
+                                    "예정된 알림이 없습니다.\n새로운 알림을 등록해주세요!",
                                     textAlign: TextAlign.justify,
                                     style: TextStyle(
                                       fontWeight: FontWeight.w600,
