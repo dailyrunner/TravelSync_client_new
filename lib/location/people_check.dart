@@ -2,7 +2,10 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:travelsync_client_new/group/group_main_page.dart';
+import 'package:travelsync_client_new/location/one_location.dart';
 import 'package:travelsync_client_new/logo/airplaneLogo.dart';
+import 'package:travelsync_client_new/models/locationinfo.dart';
 import 'package:travelsync_client_new/models/userinfo.dart';
 import 'package:travelsync_client_new/widget/globals.dart';
 import 'package:travelsync_client_new/widgets/header.dart';
@@ -17,13 +20,16 @@ class PeopleCheck extends StatefulWidget {
 
 class _PeopleCheckState extends State<PeopleCheck> {
   late String url;
+  bool locationExist = false;
+  List<LocationCheck> locationList = [];
+  int notNear = 0;
 
   static const storage =
       FlutterSecureStorage(); // FlutterSecureStorage를 storage로 저장
   dynamic userKey = ''; // storage에 있는 유저 정보를 저장
   dynamic userInfo = '';
   dynamic groupId = '';
-  int peopleNearby = 0;
+  String peopleNearby = '로딩중..';
 
   UserInfo realUserInfo = UserInfo('로딩중.....', '로딩중...', '로딩중.......');
 
@@ -40,6 +46,8 @@ class _PeopleCheckState extends State<PeopleCheck> {
     } else {
       userInfo = jsonDecode(userKey);
       await getUserInfo();
+      await getCountmember();
+      await waitForLocation();
     }
   }
 
@@ -47,7 +55,13 @@ class _PeopleCheckState extends State<PeopleCheck> {
   void initState() {
     super.initState();
 
-    _asyncMethod();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _asyncMethod();
+    });
+  }
+
+  Future<void> wait() async {
+    await waitForLocation();
   }
 
   @override
@@ -66,7 +80,15 @@ class _PeopleCheckState extends State<PeopleCheck> {
             tooltip: '뒤로가기',
             color: Colors.black,
             onPressed: () {
-              navigatorKey.currentState?.pop();
+              locationList = [];
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      GroupMainPage(groupId: int.parse(groupId)),
+                ),
+              );
+              //navigatorKey.currentState?.pop();
             },
           ),
         ),
@@ -76,14 +98,129 @@ class _PeopleCheckState extends State<PeopleCheck> {
             Container(
               height: 10,
             ),
-            const Header(textHeader: "인원점검"),
+            const Header(textHeader: "인원 점검"),
             Container(
               height: 80,
             ),
-            Text("${realUserInfo.name} 가이드 님 주변에"),
-            Text("$peopleNearby명이 모여있습니다."),
+            Text(
+              "${realUserInfo.name} 가이드님 주변에",
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            Text(
+              "$peopleNearby명이 모여있습니다.",
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
             Container(
               height: 80,
+            ),
+            Container(
+              alignment: Alignment.center,
+              decoration: const BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    color: Colors.grey,
+                    width: 2.0,
+                  ),
+                ),
+              ),
+              width: 360.0,
+            ),
+            Container(
+              height: 30,
+            ),
+            SizedBox(
+              height: 300,
+              child: FutureBuilder(
+                future: wait(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  } else if (snapshot.hasError) {
+                    return Center(
+                      child: Text("Future Error!\n${snapshot.error}"),
+                    );
+                  }
+                  if (!locationExist) {
+                    return Column(
+                      children: [
+                        Container(
+                          height: 110,
+                        ),
+                        const Text(
+                          '근처에 사람들이 모두 모여있습니다.',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w800,
+                            color: Color(0xFF003157),
+                          ),
+                        ),
+                      ],
+                    );
+                  } else {
+                    return ListView.separated(
+                      scrollDirection: Axis.vertical,
+                      itemCount: notNear,
+                      itemBuilder: (context, index) {
+                        var location = locationList[index];
+                        return Column(
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  width: 20,
+                                ),
+                                Text(
+                                  "${location.userName} 여행객",
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w800,
+                                    color: Color(0xFF003157),
+                                  ),
+                                ),
+                                Container(
+                                  width: 20,
+                                ),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    storage.write(
+                                        key: 'latitude',
+                                        value: location.latitude.toString());
+                                    storage.write(
+                                        key: 'longitude',
+                                        value: location.longitude.toString());
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const OneLocation(),
+                                      ),
+                                    );
+                                  },
+                                  child: const Text('위치 조회'),
+                                ),
+                              ],
+                            ),
+                            Container(
+                              height: 5,
+                            ),
+                          ],
+                        );
+                      },
+                      separatorBuilder: (context, index) => const SizedBox(
+                        height: 5,
+                      ),
+                    );
+                  }
+                },
+              ),
             ),
           ],
         ),
@@ -159,7 +296,8 @@ class _PeopleCheckState extends State<PeopleCheck> {
           headers: header);
       if (response.statusCode == 200) {
         var responseBody = jsonDecode(utf8.decode(response.bodyBytes));
-        peopleNearby = int.parse(responseBody);
+        peopleNearby = responseBody.toString();
+        print(peopleNearby);
         setState(() {});
       } else {
         if (!mounted) return;
@@ -172,18 +310,47 @@ class _PeopleCheckState extends State<PeopleCheck> {
             builder: (BuildContext context) {
               // return object of type Dialog
               return AlertDialog(
-                content: const Text("그룹페이지 api(그룹정보)오류"),
+                content: const Text("그룹정보 호출 오류"),
                 actions: <Widget>[
                   TextButton(
                     child: const Text("닫기"),
                     onPressed: () {
-                      navigatorKey.currentState?.pop();
+                      Navigator.pop(context);
                     },
                   ),
                 ],
               );
             },
           ));
+    }
+  }
+
+  waitForLocation() async {
+    try {
+      Map<String, String> header = {
+        "accept": "*/*",
+        "Authorization": "Bearer ${userInfo["accessToken"]}"
+      };
+      final response = await http.get(
+        Uri.parse('$url/location/checkmember/$groupId'),
+        headers: header,
+      );
+      if (response.statusCode == 200) {
+        notNear = 0;
+        final locations = jsonDecode(utf8.decode(response.bodyBytes));
+        for (var location in locations) {
+          LocationCheck locationCheck = LocationCheck.fromJson(location);
+          if (locationCheck.isNear == false) {
+            locationList.add(LocationCheck.fromJson(location));
+            locationExist = true;
+            notNear++;
+          }
+        }
+      } else {
+        print('error');
+      }
+    } catch (e) {
+      throw Error();
     }
   }
 }
