@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:travelsync_client_new/group/group_plan_page.dart';
 import 'package:travelsync_client_new/group/group_setting_page.dart';
 import 'package:travelsync_client_new/group/notice_location_page.dart';
 import 'package:travelsync_client_new/location/people_check.dart';
@@ -9,6 +10,7 @@ import 'package:travelsync_client_new/logo/airplaneLogo.dart';
 import 'package:travelsync_client_new/models/group.dart';
 import 'package:travelsync_client_new/models/notice.dart';
 import 'package:travelsync_client_new/models/plan.dart';
+import 'package:travelsync_client_new/models/tour.dart';
 import 'package:travelsync_client_new/notice/notice_page.dart';
 import 'package:travelsync_client_new/location/all_location.dart';
 import 'package:travelsync_client_new/widget/globals.dart';
@@ -36,6 +38,7 @@ class _GroupMainPageState extends State<GroupMainPage> {
   dynamic userInfo = '';
   late String? url;
   late int travelday;
+  Tour? selectedTour;
 
   checkUserState() async {
     userInfo = await storage.read(key: 'login');
@@ -267,10 +270,33 @@ class _GroupMainPageState extends State<GroupMainPage> {
             }
           }
         }
+        await waitForTour();
       } else {
         print('error');
       }
     } catch (e) {
+      throw Error();
+    }
+  }
+
+  waitForTour() async {
+    try {
+      Map<String, String> header = {
+        "accept": "*/*",
+        "Authorization": "Bearer ${userInfo["accessToken"]}"
+      };
+      final response = await http.get(
+        Uri.parse('$url/tour/${groupdetail.groupId}'),
+        headers: header,
+      );
+      if (response.statusCode == 200) {
+        var responsebody = jsonDecode(utf8.decode(response.bodyBytes));
+        selectedTour = Tour.fromJson(responsebody);
+      } else {
+        print('error');
+      }
+    } catch (e) {
+      print(e);
       throw Error();
     }
   }
@@ -429,7 +455,7 @@ class _GroupMainPageState extends State<GroupMainPage> {
                               if (isGuide)
                                 IconButton(
                                   onPressed: goNoticePage,
-                                  icon: const Icon(Icons.search),
+                                  icon: const Icon(Icons.edit),
                                 ),
                             ],
                           ),
@@ -471,72 +497,68 @@ class _GroupMainPageState extends State<GroupMainPage> {
                                       ),
                                       child: Row(
                                         children: [
-                                          SizedBox(
-                                            width: 238,
-                                            child: Row(
-                                              children: [
-                                                const Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    Text(
-                                                      "위치",
-                                                      style: TextStyle(
-                                                        fontSize: 18,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                      ),
+                                          Row(
+                                            children: [
+                                              const Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Text(
+                                                    "위치",
+                                                    style: TextStyle(
+                                                      fontSize: 18,
+                                                      fontWeight:
+                                                          FontWeight.w600,
                                                     ),
-                                                    SizedBox(height: 4),
-                                                    Text(
-                                                      "시간",
-                                                      style: TextStyle(
-                                                        fontSize: 18,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                Padding(
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                      horizontal: 6,
-                                                      vertical: 8),
-                                                  child: Container(
-                                                    width: 1,
-                                                    height: 42,
-                                                    color: Colors.black,
                                                   ),
-                                                ),
-                                                Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      upcomingNotice
-                                                          .noticeTitle,
-                                                      style: const TextStyle(
-                                                        fontSize: 18,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                      ),
+                                                  SizedBox(height: 4),
+                                                  Text(
+                                                    "시간",
+                                                    style: TextStyle(
+                                                      fontSize: 18,
+                                                      fontWeight:
+                                                          FontWeight.w600,
                                                     ),
-                                                    const SizedBox(height: 4),
-                                                    Text(
-                                                      "${upcomingNotice.parseHour()}:${upcomingNotice.parseMinute()}",
-                                                      style: const TextStyle(
-                                                        fontSize: 18,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                      ),
-                                                    ),
-                                                  ],
+                                                  ),
+                                                ],
+                                              ),
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 6,
+                                                        vertical: 8),
+                                                child: Container(
+                                                  width: 1,
+                                                  height: 42,
+                                                  color: Colors.black,
                                                 ),
-                                              ],
-                                            ),
+                                              ),
+                                              Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    upcomingNotice.noticeTitle,
+                                                    style: const TextStyle(
+                                                      fontSize: 18,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 4),
+                                                  Text(
+                                                    "${upcomingNotice.parseHour()}:${upcomingNotice.parseMinute()}",
+                                                    style: const TextStyle(
+                                                      fontSize: 18,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
                                           ),
                                           IconButton(
                                             onPressed: () {
@@ -569,9 +591,9 @@ class _GroupMainPageState extends State<GroupMainPage> {
                       ),
                       Column(
                         children: [
-                          const Row(
+                          Row(
                             children: [
-                              Text(
+                              const Text(
                                 "TOUR",
                                 style: TextStyle(
                                   fontSize: 24,
@@ -579,8 +601,12 @@ class _GroupMainPageState extends State<GroupMainPage> {
                                   color: Color(0xff002357),
                                 ),
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 width: 5,
+                              ),
+                              IconButton(
+                                onPressed: goGroupPlanPage,
+                                icon: const Icon(Icons.search),
                               ),
                             ],
                           ),
@@ -592,6 +618,7 @@ class _GroupMainPageState extends State<GroupMainPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Container(
+                                  height: 216,
                                   width: 1,
                                   color: Colors.black,
                                 ),
@@ -629,6 +656,7 @@ class _GroupMainPageState extends State<GroupMainPage> {
                                           ),
                                           Container(
                                             width: 300,
+                                            height: 180,
                                             decoration: BoxDecoration(
                                               borderRadius:
                                                   BorderRadius.circular(20),
@@ -788,5 +816,34 @@ class _GroupMainPageState extends State<GroupMainPage> {
             }),
       ),
     );
+  }
+
+  void goGroupPlanPage() {
+    if (groupdetail.tourId == null || selectedTour == null) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          // return object of type Dialog
+          return AlertDialog(
+            content: const Text("그룹에 지정된 계획이 없습니다."),
+            actions: <Widget>[
+              TextButton(
+                child: const Text("닫기"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    } else {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  GroupPlanPage(selectedTour: selectedTour!)));
+    }
   }
 }
