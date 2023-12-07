@@ -153,7 +153,7 @@ class GuideLocationState extends State<GuideLocation> {
             ),
             SizedBox(
               width: 380,
-              height: 620,
+              height: 600,
               child: GoogleMap(
                 mapType: MapType.normal,
                 initialCameraPosition: const CameraPosition(
