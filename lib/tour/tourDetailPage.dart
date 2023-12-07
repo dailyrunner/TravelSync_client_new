@@ -80,7 +80,7 @@ class _TourDetailPageState extends State<TourDetailPage> {
           planList =
               plansJson.map((planJson) => Plan.fromJson(planJson)).toList();
 
-          // maxDay 값을 planDay에 할당합니다.
+          // maxDay 값을 planDay에 할당
           planDay = planList.isNotEmpty
               ? planList.map((plan) => plan.day).toSet().length
               : 1;
@@ -173,42 +173,6 @@ class _TourDetailPageState extends State<TourDetailPage> {
   }
 
 //
-  Future<void> deleteGroupAlert() async {
-    return showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          content: const Text("정말로 이 투어를 삭제할까요?"),
-          actions: <Widget>[
-            TextButton(
-              child: Text(
-                "네",
-                style: TextStyle(
-                  color: Colors.grey[400],
-                ),
-              ),
-              onPressed: () async {
-                Navigator.pop(context);
-                await deleteTourAndPlans(widget.selectedTour.tourId);
-              },
-            ),
-            TextButton(
-              child: const Text(
-                "아니오",
-                style: TextStyle(
-                  color: Colors.red,
-                ),
-              ),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   Future<void> deleteTourAndPlans(int tourId) async {
     try {
       Map<String, String> header = {
@@ -221,12 +185,6 @@ class _TourDetailPageState extends State<TourDetailPage> {
         Uri.parse('$url/tour/$tourId'),
         headers: header,
       );
-
-      // Delete the plans associated with the tour
-      // final plansResponse = await http.delete(
-      //   Uri.parse('$url/plan/$tourId'),
-      //   headers: header,
-      // );
 
       if (tourResponse.statusCode == 200) {
         // Tour and plans deleted successfully
@@ -289,6 +247,19 @@ class _TourDetailPageState extends State<TourDetailPage> {
     }
   }
 
+  void sortPlans(List<Plan> plans) {
+    //day, time을 기준으로 오름차순 정렬
+    plans.sort((a, b) {
+      // day비교
+      int dayComparison = a.day.compareTo(b.day);
+      if (dayComparison != 0) {
+        return dayComparison;
+      }
+      // day가 같을 때 time비교
+      return a.time.compareTo(b.time);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final selectedTour = widget.selectedTour;
@@ -301,7 +272,7 @@ class _TourDetailPageState extends State<TourDetailPage> {
           leading: IconButton(
             icon: const Icon(
               Icons.arrow_back,
-              size: 30,
+              size: 40,
             ),
             tooltip: '뒤로가기',
             color: Colors.black,
@@ -340,7 +311,7 @@ class _TourDetailPageState extends State<TourDetailPage> {
                         '여행사 | ${selectedTour.tourCompany}',
                         style: const TextStyle(
                           fontSize: 14,
-                          fontWeight: FontWeight.w400,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
@@ -380,10 +351,11 @@ class _TourDetailPageState extends State<TourDetailPage> {
                               child: Text(
                                 'Day ${index + 1}',
                                 style: TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 20,
+                                  fontFamily: 'Inter',
                                   color: index + 1 == selectedDay
-                                      ? Colors.blue // 선택된 일자는 흰색으로 변경
-                                      : Colors.grey,
+                                      ? Colors.blue[700] // 선택된 일자는 흰색으로 변경
+                                      : Colors.black,
                                 ),
                               ),
                             ),
@@ -398,41 +370,85 @@ class _TourDetailPageState extends State<TourDetailPage> {
                         color: Color.fromARGB(255, 187, 214, 255),
                       ),
                     ),
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      width: 364,
+                      height: 40,
+                      child: Text("$selectedDay일차",
+                          style: const TextStyle(
+                              fontSize: 20,
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w600)),
+                    ),
+                    const SizedBox(
+                      height: 15,
+                    ),
+
                     for (Plan plan in planList)
                       if (plan.day == selectedDay)
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '${plan.day} 일차', // Display the day here
-                              style: const TextStyle(
-                                fontSize: 16,
-                                color: Colors.grey,
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Container(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 16.0),
+                            decoration: const BoxDecoration(
+                              border: Border(
+                                left:
+                                    BorderSide(color: Colors.blue, width: 2.0),
+                                right:
+                                    BorderSide(color: Colors.blue, width: 2.0),
                               ),
                             ),
-                            Text(
-                              '일정 제목: ${plan.planTitle}',
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
-                              ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(
+                                      plan.time,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.grey,
+                                        fontFamily: 'YourDesiredFont',
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 30),
+                                    Text(
+                                      plan.planTitle,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontFamily: 'Inter',
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    const Text(
+                                      '세부 정보 ',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey,
+                                        fontFamily: 'Inter',
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 13),
+                                    Text(
+                                      plan.planContent,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontFamily: 'Inter',
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
-                            Text(
-                              '일정 시간: ${plan.time}',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                color: Colors.grey,
-                              ),
-                            ),
-                            Text(
-                              '일정 내용: ${plan.planContent}',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                color: Colors.grey,
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                          ],
+                          ),
                         ),
                   ],
                 ),
@@ -444,137 +460,3 @@ class _TourDetailPageState extends State<TourDetailPage> {
     );
   }
 }
-
-//         backgroundColor: Colors.white,
-//         body: Column(
-//           children: [
-//             const airplaneLogo(),
-//             const SizedBox(height: 20),
-//             const Header(textHeader: 'TOUR'),
-//             const SizedBox(height: 8),
-//             //tour, plan detail
-//             SizedBox(
-//               child: Text(
-//                 '여행사 | ${selectedTour.tourCompany}',
-//                 style: const TextStyle(
-//                   fontSize: 14,
-//                   fontWeight: FontWeight.w400,
-//                 ),
-//               ),
-//             ),
-//             SizedBox(
-//               width: 380,
-//               child: Text(
-//                 selectedTour.tourName,
-//                 style: const TextStyle(
-//                   fontSize: 28,
-//                   fontWeight: FontWeight.bold,
-//                   fontFamily: 'Inter',
-//                 ),
-//                 textAlign: TextAlign.center,
-//               ),
-//             ),
-
-//             const Divider(
-//               thickness: 2.0,
-//               color: Color.fromARGB(255, 187, 214, 255),
-//             ),
-//             // Day 동적 생성 부분
-//             SizedBox(
-//               height: 30,
-//               child: SingleChildScrollView(
-//                 scrollDirection: Axis.horizontal,
-//                 child: Row(
-//                   children: [
-//                     for (int i = 1; i <= planDay; i++)
-//                       GestureDetector(
-//                         onTap: () {
-//                           setState(() {
-//                             selectedDay = i; // 선택된 Day 업데이트
-//                           });
-//                         },
-//                         child: Container(
-//                           width: 80,
-//                           alignment: Alignment.centerLeft,
-//                           margin: const EdgeInsets.symmetric(horizontal: 5),
-//                           child: Text(
-//                             'Day$i',
-//                             style: TextStyle(
-//                               color: selectedDay == i
-//                                   ? const Color(0xff004ECF)
-//                                   : Colors.black,
-//                               fontSize: 19,
-//                               fontWeight: FontWeight.w400,
-//                               fontFamily: 'Inter',
-//                             ),
-//                           ),
-//                         ),
-//                       ),
-//                   ],
-//                 ),
-//               ),
-//             ),
-//             const Divider(
-//               thickness: 2.0,
-//               color: Color.fromARGB(255, 187, 214, 255),
-//             ),
-//             const SizedBox(
-//               height: 12,
-//             ),
-//             // 선택된 Day에 해당하는 계획 출력
-//             // if (selectedDay > 0 && selectedDay <= planDay)
-//               SizedBox(
-//                 width: 360,
-//                 child: Column(
-//                   crossAxisAlignment: CrossAxisAlignment.start,
-//                   children: [
-//                     Text(
-//                       '$selectedDay일차', // Display the selected day here
-//                       style: const TextStyle(
-//                           fontSize: 20,
-//                           fontFamily: 'Inter',
-//                           fontWeight: FontWeight.w500),
-//                     ),
-//                     const SizedBox(
-//                       height: 20,
-//                     ),
-//                     Row(
-//                       crossAxisAlignment: CrossAxisAlignment.start,
-//                       children: [
-//                         Container(
-//                           height: 100,
-//                           width: 2, // 세로 선의 너비
-//                           color: Colors.blue, // 세로 선의 색상
-//                           margin: const EdgeInsets.only(
-//                               right: 10), // 세로 선과 텍스트 간의 간격 조절
-//                         ),
-//                         // 해당 Day의 상세 정보 출력
-//                         Text(
-//                           '${planList[selectedDay].time}    ${planList[selectedDay - 1].planTitle}',
-//                           style: const TextStyle(
-//                             fontSize: 18,
-//                             fontWeight: FontWeight.w500,
-//                             fontFamily: 'Inter',
-//                           ),
-//                         ),
-//                       ],
-//                     ),
-
-//                     // Text(
-//                     //   '일정 내용: ${planList[selectedDay - 1].planContent}',
-//                     //   style: const TextStyle(
-//                     //     fontSize: 16,
-//                     //     color: Colors.black,
-
-//                     //   ),
-//                     // ),
-//                     const SizedBox(height: 10),
-//                   ],
-//                 ),
-//               ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
