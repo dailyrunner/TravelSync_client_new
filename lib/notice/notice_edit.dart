@@ -316,6 +316,28 @@ class _NoticeEditPageState extends State<NoticeEditPage> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(
+              Icons.arrow_back,
+              size: 30,
+            ),
+            tooltip: '뒤로가기',
+            color: Colors.black,
+            onPressed: () {
+              Future.microtask(() {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => NoticePage(groupId: widget.groupId),
+                  ),
+                );
+              });
+            },
+          ),
+        ),
         body: FutureBuilder(
             future: _noticeInfoFuture,
             builder: (context, snapshot) {
@@ -334,9 +356,6 @@ class _NoticeEditPageState extends State<NoticeEditPage> {
                   child: Column(
                     children: [
                       const Header(textHeader: "Edit NOTICE"),
-                      const SizedBox(
-                        height: 40,
-                      ),
                       const SizedBox(
                         height: 20,
                       ),
@@ -447,7 +466,7 @@ class _NoticeEditPageState extends State<NoticeEditPage> {
                         ],
                       ),
                       SizedBox(
-                        height: 410,
+                        height: 350,
                         width: 320,
                         child: GoogleMap(
                             initialCameraPosition: CameraPosition(

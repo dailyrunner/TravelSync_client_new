@@ -157,6 +157,28 @@ class _NoticeCreatePageState extends State<NoticeCreatePage> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(
+              Icons.arrow_back,
+              size: 30,
+            ),
+            tooltip: '뒤로가기',
+            color: Colors.black,
+            onPressed: () {
+              Future.microtask(() {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => NoticePage(groupId: widget.groupId),
+                  ),
+                );
+              });
+            },
+          ),
+        ),
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(20.0),
@@ -269,7 +291,7 @@ class _NoticeCreatePageState extends State<NoticeCreatePage> {
                   ],
                 ),
                 SizedBox(
-                  height: 410,
+                  height: 350,
                   width: 320,
                   child: GoogleMap(
                       initialCameraPosition: const CameraPosition(
