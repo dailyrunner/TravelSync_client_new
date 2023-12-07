@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:travelsync_client_new/group/group_main_page.dart';
 import 'package:travelsync_client_new/group/tour_import_page.dart';
@@ -38,6 +39,10 @@ class _GroupSettingPageState extends State<GroupSettingPage> {
             builder: (context) => TourImportPage(
                   userId: userInfo["accountName"],
                 )));
+  }
+
+  resetTour() async {
+    _selectedTourId = null;
   }
 
   updateGroupSetting() async {
@@ -344,7 +349,8 @@ class _GroupSettingPageState extends State<GroupSettingPage> {
             : isGuide = false;
         _isLocationShareEnabled = groupdetail.toggleLoc;
         _selectedTourId = groupdetail.tourId;
-        inviteCode = '${groupdetail.tourCompany}/${groupdetail.groupId}';
+        inviteCode =
+            '${groupdetail.guide.substring(1, 4)}/${groupdetail.groupId}';
         inviteCode = base64Encode(utf8.encode(inviteCode));
       } else {
         if (!mounted) return;
@@ -492,6 +498,30 @@ class _GroupSettingPageState extends State<GroupSettingPage> {
                                 ),
                               ],
                             ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  "투어 초기화",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                ElevatedButton(
+                                  onPressed: resetTour,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xfff5fbff),
+                                  ),
+                                  child: const Text(
+                                    "TOUR 초기화",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                             const SizedBox(
                               height: 20,
                             ),
@@ -504,6 +534,26 @@ class _GroupSettingPageState extends State<GroupSettingPage> {
                               textAlign: TextAlign.center,
                             ),
                             Text(inviteCode),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            ElevatedButton(
+                              onPressed: () => Clipboard.setData(
+                                ClipboardData(text: inviteCode),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xfff5fbff),
+                              ),
+                              child: const Text(
+                                "코드 복사",
+                                style: TextStyle(
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
                             ElevatedButton(
                               onPressed: updateGroupSetting,
                               style: ElevatedButton.styleFrom(

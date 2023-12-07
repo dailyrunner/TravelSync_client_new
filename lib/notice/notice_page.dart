@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:travelsync_client_new/group/group_main_page.dart';
 import 'package:travelsync_client_new/models/group.dart';
 import 'package:travelsync_client_new/models/notice.dart';
 import 'package:travelsync_client_new/notice/notice_create.dart';
@@ -138,6 +139,29 @@ class _NoticePageState extends State<NoticePage> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(
+              Icons.arrow_back,
+              size: 30,
+            ),
+            tooltip: '뒤로가기',
+            color: Colors.black,
+            onPressed: () {
+              Future.microtask(() {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        GroupMainPage(groupId: groupdetail.groupId),
+                  ),
+                );
+              });
+            },
+          ),
+        ),
         body: FutureBuilder(
             future: wait(),
             builder: (context, snapshot) {
@@ -159,7 +183,7 @@ class _NoticePageState extends State<NoticePage> {
                         textHeader: "Notice",
                       ),
                       const SizedBox(
-                        height: 60,
+                        height: 20,
                       ),
                       if (!noticeExist)
                         Column(
