@@ -161,6 +161,9 @@ class _GroupMainPageState extends State<GroupMainPage> {
                     int.parse(dayparts[1]), int.parse(dayparts[2])))
                 .inDays +
             1;
+        if (travelday < 1) {
+          travelday = 1;
+        }
         await waitForNotice();
       } else {
         if (!mounted) return;
@@ -471,7 +474,7 @@ class _GroupMainPageState extends State<GroupMainPage> {
                                   color: Colors.black,
                                 ),
                                 const SizedBox(
-                                  width: 5,
+                                  width: 20,
                                 ),
                                 if (!noticeExist)
                                   const Text(
@@ -634,7 +637,7 @@ class _GroupMainPageState extends State<GroupMainPage> {
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
-                                if (planExist)
+                                if (todayPlan.isNotEmpty)
                                   SizedBox(
                                     width: 320,
                                     child: Padding(
