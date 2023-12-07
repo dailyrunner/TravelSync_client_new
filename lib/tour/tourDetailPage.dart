@@ -7,7 +7,6 @@ import 'package:travelsync_client_new/logo/airplaneLogo.dart';
 import 'package:travelsync_client_new/models/plan.dart';
 import 'package:travelsync_client_new/models/tour.dart';
 import 'package:travelsync_client_new/tour/EditTourPlanPage.dart';
-import 'package:travelsync_client_new/tour/createTour.dart';
 import 'package:travelsync_client_new/tour/tourListPage.dart';
 import 'package:travelsync_client_new/widget/globals.dart';
 import 'package:travelsync_client_new/widgets/header.dart';
@@ -26,9 +25,7 @@ class _TourDetailPageState extends State<TourDetailPage> {
   dynamic selectedTour;
   late List<Plan> planList = [];
   int planDay = 1;
-  //late List<Tour> tourList = [];
   static const storage = FlutterSecureStorage();
-  // dynamic userKey = '';
   dynamic userInfo = '';
   late String? url;
   int selectedDay = 1;
@@ -282,6 +279,78 @@ class _TourDetailPageState extends State<TourDetailPage> {
     });
   }
 
+  deletePlan(int planId) async {
+    try {
+      Map<String, String> header = {
+        "accept": "*/*",
+        "Authorization": "Bearer ${userInfo['accessToken']}"
+      };
+      final response =
+          await http.delete(Uri.parse('$url/plan/$planId'), headers: header);
+      if (response.statusCode == 200) {
+        if (!mounted) return;
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            // return object of type Dialog
+            return AlertDialog(
+              content: const Text("플랜 삭제 완료"),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text("닫기"),
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const TourListPage()));
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        if (!mounted) return;
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            // return object of type Dialog
+            return AlertDialog(
+              content: const Text("플랜 삭제 실패"),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text("닫기"),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          // return object of type Dialog
+          return AlertDialog(
+            content: const Text("api오류"),
+            actions: <Widget>[
+              TextButton(
+                child: const Text("닫기"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final selectedTour = widget.selectedTour;
@@ -403,32 +472,6 @@ class _TourDetailPageState extends State<TourDetailPage> {
                               fontWeight: FontWeight.w600,
                             ),
                           ),
-                          // 수정 버튼 추가
-                          // TextButton(
-                          //   onPressed: () {
-                          //     // 선택된 일자의 모든 계획을 수정 페이지로 이동
-                          //     editPlansForSelectedDay(selectedDay);
-                          //   },
-                          //
-                          //     const Row(
-                          //       children: [
-                          //         Icon(
-                          //           Icons.edit,
-                          //           size: 20,
-                          //           color: Colors.black,
-                          //         ),
-                          //         Text(
-                          //           "수정하기",
-                          //           style: TextStyle(
-                          //             fontSize: 12,
-                          //             fontFamily: 'Inter',
-                          //             fontWeight: FontWeight.w600,
-                          //             color: Colors.black,
-                          //           ),
-                          //         ),
-                          //       ],
-                          //     ),
-                          // ),
                         ],
                       ),
                     ),
@@ -465,12 +508,16 @@ class _TourDetailPageState extends State<TourDetailPage> {
                                       ),
                                     ),
                                     const SizedBox(width: 30),
-                                    Text(
-                                      plan.planTitle,
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontFamily: 'Inter',
-                                        fontWeight: FontWeight.w600,
+                                    Expanded(
+                                      child: Text(
+                                        plan.planTitle,
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontFamily: 'Inter',
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 4,
                                       ),
                                     ),
                                     IconButton(
@@ -495,6 +542,18 @@ class _TourDetailPageState extends State<TourDetailPage> {
                                         );
                                       },
                                     ),
+                                    IconButton(
+                                      icon: const Icon(
+                                        Icons.disabled_by_default_rounded,
+                                        size: 20,
+                                        color: Colors.red,
+                                      ),
+                                      onPressed: () {
+                                        deletePlan(
+                                          plan.planId, // 선택된 계획의 ID 전달
+                                        );
+                                      },
+                                    ),
                                   ],
                                 ),
                                 Row(
@@ -509,12 +568,16 @@ class _TourDetailPageState extends State<TourDetailPage> {
                                       ),
                                     ),
                                     const SizedBox(width: 13),
-                                    Text(
-                                      plan.planContent,
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontFamily: 'Inter',
-                                        fontWeight: FontWeight.w400,
+                                    Expanded(
+                                      child: Text(
+                                        plan.planContent,
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontFamily: 'Inter',
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 8,
                                       ),
                                     ),
                                   ],

@@ -38,26 +38,17 @@ class _EditTourPlanPageState extends State<EditTourPlanPage> {
   late String url;
   static const storage =
       FlutterSecureStorage(); // FlutterSecureStorage를 storage로 저장
-  dynamic userInfo = ''; // storage에 있는 유저 정보를 저장
-  //flutter_secure_storage 사용을 위한 초기화 작업
+  dynamic userInfo = '';
   @override
   void initState() {
     super.initState();
     _asyncMethod();
-    // fetchTourDetails();
-    // 비동기로 flutter secure storage 정보를 불러오는 작업
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-
-    // });
   }
 
   _asyncMethod() async {
-    // read 함수로 key값에 맞는 정보를 불러오고 데이터타입은 String 타입
-    // 데이터가 없을때는 null을 반환
     userInfo = await storage.read(key: 'login');
     url = (await storage.read(key: 'address'))!;
     userInfo = jsonDecode(userInfo);
-    // user의 정보가 있다면 로그인 후 들어가는 첫 페이지로 넘어가게 합니다.
     if (userInfo == null) {
       Navigator.pushNamed(context, '/');
     }
@@ -129,11 +120,11 @@ class _EditTourPlanPageState extends State<EditTourPlanPage> {
         });
         print('성공');
       } else {
-        print('플랜 생성 실패. 상태 코드: ${response.statusCode}');
+        print('플랜 수정 실패. 상태 코드: ${response.statusCode}');
         print('응답 바디: ${response.body}');
       }
     } catch (error) {
-      print('플랜 생성 오류: $error');
+      print('플랜 수정 오류: $error');
     }
   }
 
@@ -182,7 +173,7 @@ class _EditTourPlanPageState extends State<EditTourPlanPage> {
             tooltip: '뒤로가기',
             color: Colors.black,
             onPressed: () {
-              navigatorKey.currentState?.pushNamed('/main');
+              navigatorKey.currentState?.pushNamed('/main/tour');
             },
           ),
         ),
@@ -192,6 +183,17 @@ class _EditTourPlanPageState extends State<EditTourPlanPage> {
             const airplaneLogo(),
             const SizedBox(height: 20),
             const Header(textHeader: 'Edit PLAN'),
+            const SizedBox(
+              height: 10,
+            ),
+            const Text(
+              "시간과 장소는 필수항목입니다.",
+              style: TextStyle(
+                  fontFamily: 'Inter',
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xff002357)),
+            ),
             const SizedBox(height: 16),
             Expanded(
               child: SingleChildScrollView(
@@ -215,27 +217,60 @@ class _EditTourPlanPageState extends State<EditTourPlanPage> {
                     //       fontWeight: FontWeight.bold,
                     //     ),
                     //   ),
-                    TextField(
-                      controller: timeController,
-                      decoration: const InputDecoration(
-                        labelText: '시간',
+                    SizedBox(
+                      width: 300,
+                      child: TextField(
+                        controller: timeController,
+                        decoration: const InputDecoration(
+                          labelText: '시간',
+                        ),
                       ),
                     ),
-                    TextField(
-                      controller: titleController,
-                      decoration: const InputDecoration(labelText: '장소'),
+                    SizedBox(
+                      width: 300,
+                      child: TextField(
+                        controller: titleController,
+                        decoration: const InputDecoration(labelText: '장소'),
+                      ),
                     ),
-                    TextField(
-                      controller: contentController,
-                      decoration: const InputDecoration(labelText: '내용'),
+                    SizedBox(
+                      width: 300,
+                      child: TextField(
+                        controller: contentController,
+                        decoration: const InputDecoration(labelText: '내용'),
+                      ),
                     ),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () {
-                        // 편집된 내용을 저장하고 이전 화면으로 돌아갑니다.
-                        saveEditedPlan();
-                      },
-                      child: const Text('저장'),
+                    const SizedBox(height: 30),
+                    SizedBox(
+                      width: 120,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          saveEditedPlan();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFEFF5FF),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          shadowColor: const Color.fromARGB(255, 80, 80, 80)
+                              .withOpacity(0.7),
+                          elevation: 2.0,
+                        ),
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(
+                            vertical: 12,
+                            horizontal: 16,
+                          ),
+                          child: Text(
+                            '수정 완료',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ),
