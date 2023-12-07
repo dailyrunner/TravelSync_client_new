@@ -51,7 +51,7 @@ class _NoticeCreatePageState extends State<NoticeCreatePage> {
   void searchLocation() {}
   createNotice() async {
     try {
-      String finalTime = DateFormat('yyyy-MM-dd hh:mm').format(DateTime(
+      String finalTime = DateFormat('yyyy-MM-dd HH:mm').format(DateTime(
           _setDate.year, _setDate.month, _setDate.day, _setHour, _setMinute));
       Map<String, dynamic> data = {
         'groupId': widget.groupId,

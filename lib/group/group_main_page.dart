@@ -29,11 +29,13 @@ class _GroupMainPageState extends State<GroupMainPage> {
   bool noticeExist = false;
   bool planExist = false;
   late GroupDetail groupdetail;
-  List<Notice> noticeList = [];
+  late Notice upcomingNotice;
   List<Plan> planList = [];
+  List<Plan> todayPlan = [];
   static const storage = FlutterSecureStorage();
   dynamic userInfo = '';
   late String? url;
+  late int travelday;
 
   checkUserState() async {
     userInfo = await storage.read(key: 'login');
@@ -149,6 +151,13 @@ class _GroupMainPageState extends State<GroupMainPage> {
         if (groupdetail.guide == userInfo['accountName']) {
           isGuide = true;
         }
+        List<dynamic> dayparts = groupdetail.startDate.split('-');
+        DateTime today = DateTime.now();
+        travelday = DateTime(today.year, today.month, today.day)
+                .difference(DateTime(int.parse(dayparts[0]),
+                    int.parse(dayparts[1]), int.parse(dayparts[2])))
+                .inDays +
+            1;
         await waitForNotice();
       } else {
         if (!mounted) return;
@@ -204,9 +213,14 @@ class _GroupMainPageState extends State<GroupMainPage> {
       );
       if (response.statusCode == 200) {
         final notices = jsonDecode(utf8.decode(response.bodyBytes));
-        for (var notice in notices) {
-          noticeList.add(Notice.fromJson(notice));
+        for (dynamic notice in notices) {
+          notice = Notice.fromJson(notice);
+          if (DateTime.parse(notice.noticeDate).isBefore(DateTime.now())) {
+            continue;
+          }
+          upcomingNotice = notice;
           noticeExist = true;
+          break;
         }
         await waitForPlanList();
       } else {
@@ -233,12 +247,45 @@ class _GroupMainPageState extends State<GroupMainPage> {
           planList.add(Plan.fromJson(plan));
           planExist = true;
         }
+        if (planList.length > 1) {
+          sortPlans(planList);
+        }
+        if (travelday <= 1) {
+          for (Plan plan in planList) {
+            if (plan.day != 1) break;
+            todayPlan.add(plan);
+          }
+        } else {
+          for (Plan plan in planList) {
+            if (plan.day < travelday) {
+              continue;
+            }
+            if (plan.day == travelday) {
+              todayPlan.add(plan);
+            } else {
+              break;
+            }
+          }
+        }
       } else {
         print('error');
       }
     } catch (e) {
       throw Error();
     }
+  }
+
+  void sortPlans(List<Plan> plans) {
+    //day, time을 기준으로 오름차순 정렬
+    plans.sort((a, b) {
+      // day비교
+      int dayComparison = a.day.compareTo(b.day);
+      if (dayComparison != 0) {
+        return dayComparison;
+      }
+      // day가 같을 때 time비교
+      return a.time.compareTo(b.time);
+    });
   }
 
   Future<void> wait() async {
@@ -388,7 +435,7 @@ class _GroupMainPageState extends State<GroupMainPage> {
                           ),
                           const SizedBox(height: 10),
                           SizedBox(
-                            height: 150,
+                            height: 62,
                             width: 336,
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -408,139 +455,107 @@ class _GroupMainPageState extends State<GroupMainPage> {
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
-                                // notice API 받아올시 Container 안에 넣어서 리스트 띄우기
-
                                 if (noticeExist)
-                                  SizedBox(
-                                    width: 320,
-                                    child: ListView.separated(
-                                      scrollDirection: Axis.vertical,
-                                      itemCount: noticeList.length,
-                                      shrinkWrap: true,
-                                      itemBuilder: (context, index) {
-                                        var notice = noticeList[index];
-                                        return Container(
-                                          width: 300,
-                                          height: 62,
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(20),
-                                            border: Border.all(
-                                              color: Colors.black,
-                                            ),
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 16,
-                                            ),
+                                  Container(
+                                    width: 300,
+                                    height: 62,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          SizedBox(
+                                            width: 238,
                                             child: Row(
                                               children: [
-                                                SizedBox(
-                                                  width: 238,
-                                                  child: Row(
-                                                    children: [
-                                                      const Column(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: [
-                                                          Text(
-                                                            "위치",
-                                                            style: TextStyle(
-                                                              fontSize: 18,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w600,
-                                                            ),
-                                                          ),
-                                                          SizedBox(height: 4),
-                                                          Text(
-                                                            "시간",
-                                                            style: TextStyle(
-                                                              fontSize: 18,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w600,
-                                                            ),
-                                                          ),
-                                                        ],
+                                                const Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    Text(
+                                                      "위치",
+                                                      style: TextStyle(
+                                                        fontSize: 18,
+                                                        fontWeight:
+                                                            FontWeight.w600,
                                                       ),
-                                                      Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .symmetric(
-                                                                horizontal: 6,
-                                                                vertical: 8),
-                                                        child: Container(
-                                                          width: 1,
-                                                          height: 42,
-                                                          color: Colors.black,
-                                                        ),
+                                                    ),
+                                                    SizedBox(height: 4),
+                                                    Text(
+                                                      "시간",
+                                                      style: TextStyle(
+                                                        fontSize: 18,
+                                                        fontWeight:
+                                                            FontWeight.w600,
                                                       ),
-                                                      Column(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Text(
-                                                            notice.noticeTitle,
-                                                            style:
-                                                                const TextStyle(
-                                                              fontSize: 18,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w600,
-                                                            ),
-                                                          ),
-                                                          const SizedBox(
-                                                              height: 4),
-                                                          Text(
-                                                            "${notice.parseHour()}:${notice.parseMinute()}",
-                                                            style:
-                                                                const TextStyle(
-                                                              fontSize: 18,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w600,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ],
+                                                    ),
+                                                  ],
+                                                ),
+                                                Padding(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 6,
+                                                      vertical: 8),
+                                                  child: Container(
+                                                    width: 1,
+                                                    height: 42,
+                                                    color: Colors.black,
                                                   ),
                                                 ),
-                                                if (notice.noticeLatitude !=
-                                                        0 &&
-                                                    notice.noticeLongitude != 0)
-                                                  IconButton(
-                                                    onPressed: () {
-                                                      Navigator.push(
-                                                          context,
-                                                          MaterialPageRoute(
-                                                              builder: (context) =>
-                                                                  NoticeLocationPage(
-                                                                      latitude:
-                                                                          notice
-                                                                              .noticeLatitude,
-                                                                      longitude:
-                                                                          notice
-                                                                              .noticeLongitude)));
-                                                    },
-                                                    icon: const Icon(
-                                                        Icons.location_on,
-                                                        size: 36),
-                                                  ),
+                                                Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      upcomingNotice
+                                                          .noticeTitle,
+                                                      style: const TextStyle(
+                                                        fontSize: 18,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 4),
+                                                    Text(
+                                                      "${upcomingNotice.parseHour()}:${upcomingNotice.parseMinute()}",
+                                                      style: const TextStyle(
+                                                        fontSize: 18,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
                                               ],
                                             ),
                                           ),
-                                        );
-                                      },
-                                      separatorBuilder: (context, index) =>
-                                          const SizedBox(
-                                        height: 5,
+                                          IconButton(
+                                            onPressed: () {
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          NoticeLocationPage(
+                                                              latitude:
+                                                                  upcomingNotice
+                                                                      .noticeLatitude,
+                                                              longitude:
+                                                                  upcomingNotice
+                                                                      .noticeLongitude)));
+                                            },
+                                            icon: const Icon(Icons.location_on,
+                                                size: 36),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ),
@@ -571,7 +586,7 @@ class _GroupMainPageState extends State<GroupMainPage> {
                           ),
                           const SizedBox(height: 10),
                           SizedBox(
-                            height: 150,
+                            height: 226,
                             width: 336,
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -584,9 +599,9 @@ class _GroupMainPageState extends State<GroupMainPage> {
                                   width: 5,
                                 ),
                                 // plan List 띄우는 부분
-                                if (!planExist)
+                                if (todayPlan.isEmpty)
                                   const Text(
-                                    "작성된 투어가 없습니다.\n그룹에서 새로운 투어를 가져와보세요!",
+                                    "오늘 예정된 일정이 없습니다.\n그룹에 새로운 여행 계획을 가져와보세요!",
                                     textAlign: TextAlign.justify,
                                     style: TextStyle(
                                       fontWeight: FontWeight.w600,
@@ -595,104 +610,73 @@ class _GroupMainPageState extends State<GroupMainPage> {
                                 if (planExist)
                                   SizedBox(
                                     width: 320,
-                                    child: ListView.separated(
-                                      scrollDirection: Axis.vertical,
-                                      itemCount: planList.length,
-                                      shrinkWrap: true,
-                                      itemBuilder: (context, index) {
-                                        var plan = planList[index];
-                                        return Container(
-                                          width: 300,
-                                          height: 62,
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(20),
-                                            border: Border.all(
-                                              color: Colors.black,
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          Text(
+                                            "Day $travelday",
+                                            style: const TextStyle(
+                                              fontSize: 24,
+                                              fontWeight: FontWeight.w600,
+                                              color: Color(0xff002357),
                                             ),
                                           ),
-                                          child: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                horizontal: 16,
+                                          const SizedBox(
+                                            height: 10,
+                                          ),
+                                          Container(
+                                            width: 300,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                              border: Border.all(
+                                                color: Colors.black,
                                               ),
-                                              child: Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Row(
+                                            ),
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(16.0),
+                                              child: ListView.separated(
+                                                scrollDirection: Axis.vertical,
+                                                itemCount: todayPlan.length,
+                                                shrinkWrap: true,
+                                                itemBuilder: (context, index) {
+                                                  var plan = todayPlan[index];
+                                                  return Row(
                                                     children: [
-                                                      const Column(
-                                                        children: [
-                                                          Text(
-                                                            "위치",
-                                                            style: TextStyle(
-                                                              fontSize: 18,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w600,
-                                                            ),
-                                                          ),
-                                                          SizedBox(height: 4),
-                                                          Text(
-                                                            "시간",
-                                                            style: TextStyle(
-                                                              fontSize: 18,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w600,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .symmetric(
-                                                                horizontal: 6,
-                                                                vertical: 8),
-                                                        child: Container(
-                                                          width: 1,
-                                                          height: 42,
-                                                          color: Colors.black,
+                                                      Text(
+                                                        plan.time,
+                                                        style: const TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          color: Colors.grey,
                                                         ),
                                                       ),
-                                                      const Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Text(
-                                                            "임시",
-                                                            style: TextStyle(
-                                                              fontSize: 18,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w600,
-                                                            ),
-                                                          ),
-                                                          SizedBox(height: 4),
-                                                          Text(
-                                                            "임시",
-                                                            style: TextStyle(
-                                                              fontSize: 18,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w600,
-                                                            ),
-                                                          ),
-                                                        ],
+                                                      const SizedBox(width: 16),
+                                                      Text(
+                                                        plan.planTitle,
+                                                        style: const TextStyle(
+                                                          fontSize: 18,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                        ),
                                                       ),
                                                     ],
-                                                  ),
-                                                ],
-                                              )),
-                                        );
-                                      },
-                                      separatorBuilder: (context, index) =>
-                                          const SizedBox(
-                                        height: 5,
+                                                  );
+                                                },
+                                                separatorBuilder:
+                                                    (context, index) =>
+                                                        const SizedBox(
+                                                  height: 5,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ),
