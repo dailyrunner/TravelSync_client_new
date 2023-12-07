@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:travelsync_client_new/logo/airplaneLogo.dart';
 import 'package:travelsync_client_new/models/plan.dart';
-import 'package:travelsync_client_new/plan/createPlanBox.dart';
 import 'package:travelsync_client_new/widget/globals.dart';
 import '../widgets/header.dart';
 
