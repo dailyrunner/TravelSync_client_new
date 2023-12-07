@@ -107,7 +107,7 @@ class _TourListPageState extends State<TourListPage> {
             tooltip: '뒤로가기',
             color: Colors.black,
             onPressed: () {
-              navigatorKey.currentState?.pop();
+              navigatorKey.currentState?.pushNamed('/main');
             },
           ),
         ),
